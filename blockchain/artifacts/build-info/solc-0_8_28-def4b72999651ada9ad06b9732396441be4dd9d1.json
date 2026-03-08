@@ -1,0 +1,33 @@
+{
+  "_format": "hh3-sol-build-info-1",
+  "id": "solc-0_8_28-def4b72999651ada9ad06b9732396441be4dd9d1",
+  "solcVersion": "0.8.28",
+  "solcLongVersion": "0.8.28+commit.7893614a",
+  "userSourceNameMap": {
+    "contracts/StudentVerificationLedger.sol": "project/contracts/StudentVerificationLedger.sol"
+  },
+  "input": {
+    "language": "Solidity",
+    "settings": {
+      "evmVersion": "cancun",
+      "outputSelection": {
+        "*": {
+          "": ["ast"],
+          "*": [
+            "abi",
+            "evm.bytecode",
+            "evm.deployedBytecode",
+            "evm.methodIdentifiers",
+            "metadata"
+          ]
+        }
+      },
+      "remappings": []
+    },
+    "sources": {
+      "project/contracts/StudentVerificationLedger.sol": {
+        "content": "// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.0;\r\n\r\ncontract StudentVerificationLedger {\r\n    struct VerificationRecord {\r\n        string studentId;\r\n        string documentHash;\r\n        uint faceScore;\r\n        bool verified;\r\n        uint timestamp;\r\n    }\r\n\r\n    // Mapping from student ID string to an array of their verification records\r\n    mapping(string => VerificationRecord[]) private studentRecords;\r\n\r\n    // Event emitted when a new record is added\r\n    event RecordAdded(string indexed studentId, string documentHash, uint faceScore, bool verified, uint timestamp);\r\n\r\n    /**\r\n     * @dev Add a new verification record for a student\r\n     * @param _studentId The unique string ID of the student\r\n     * @param _documentHash The SHA-256 hash of the sensitive data\r\n     * @param _faceScore The similarity score of the face match\r\n     * @param _verified Boolean indicating if verification was successful\r\n     */\r\n    function addVerificationRecord(\r\n        string memory _studentId,\r\n        string memory _documentHash,\r\n        uint _faceScore,\r\n        bool _verified\r\n    ) public {\r\n        uint _timestamp = block.timestamp;\r\n        \r\n        VerificationRecord memory newRecord = VerificationRecord({\r\n            studentId: _studentId,\r\n            documentHash: _documentHash,\r\n            faceScore: _faceScore,\r\n            verified: _verified,\r\n            timestamp: _timestamp\r\n        });\r\n\r\n        studentRecords[_studentId].push(newRecord);\r\n\r\n        emit RecordAdded(_studentId, _documentHash, _faceScore, _verified, _timestamp);\r\n    }\r\n\r\n    /**\r\n     * @dev Get a specific verification record for a student\r\n     * @param _studentId The unique string ID of the student\r\n     * @param _index The index of the record in the array\r\n     */\r\n    function getVerificationRecord(string memory _studentId, uint _index) public view returns (VerificationRecord memory) {\r\n        require(_index < studentRecords[_studentId].length, \"Record index out of bounds\");\r\n        return studentRecords[_studentId][_index];\r\n    }\r\n\r\n    /**\r\n     * @dev Get all verification records for a student\r\n     * @param _studentId The unique string ID of the student\r\n     */\r\n    function getStudentHistory(string memory _studentId) public view returns (VerificationRecord[] memory) {\r\n        return studentRecords[_studentId];\r\n    }\r\n}\r\n"
+      }
+    }
+  }
+}

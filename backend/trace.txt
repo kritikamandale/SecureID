@@ -1,0 +1,38 @@
+Traceback (most recent call last):
+  File "D:\Hackthon Projects\openpools\backend\test.py", line 3, in <module>
+    from app.routes import admin_routes
+  File "D:\Hackthon Projects\openpools\backend\app\routes\admin_routes.py", line 3, in <module>
+    from fastapi import APIRouter, Depends
+  File "C:\Users\kriti\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\fastapi\__init__.py", line 7, in <module>
+    from .applications import FastAPI as FastAPI
+  File "C:\Users\kriti\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\fastapi\applications.py", line 16, in <module>
+    from fastapi import routing
+  File "C:\Users\kriti\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\fastapi\routing.py", line 24, in <module>
+    from fastapi import params
+  File "C:\Users\kriti\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\fastapi\params.py", line 5, in <module>
+    from fastapi.openapi.models import Example
+  File "C:\Users\kriti\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\fastapi\openapi\models.py", line 68, in <module>
+    class Contact(BaseModelWithConfig):
+    ...<2 lines>...
+        email: Optional[EmailStr] = None
+  File "C:\Users\kriti\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pydantic\main.py", line 221, in __new__
+    inferred = ModelField.infer(
+        name=var_name,
+    ...<3 lines>...
+        config=config,
+    )
+  File "C:\Users\kriti\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pydantic\fields.py", line 504, in infer
+    return cls(
+        name=name,
+    ...<7 lines>...
+        field_info=field_info,
+    )
+  File "C:\Users\kriti\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pydantic\fields.py", line 434, in __init__
+    self.prepare()
+    ~~~~~~~~~~~~^^
+  File "C:\Users\kriti\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pydantic\fields.py", line 544, in prepare
+    self._set_default_and_type()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\kriti\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pydantic\fields.py", line 576, in _set_default_and_type
+    raise errors_.ConfigError(f'unable to infer type for attribute "{self.name}"')
+pydantic.errors.ConfigError: unable to infer type for attribute "name"

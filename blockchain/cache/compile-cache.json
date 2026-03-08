@@ -1,0 +1,13 @@
+{
+  "D:\\Hackthon Projects\\openpools\\blockchain\\contracts\\StudentVerificationLedger.sol": {
+    "jobHash": "solc-0_8_28-def4b72999651ada9ad06b9732396441be4dd9d1",
+    "isolated": false,
+    "artifactPaths": [
+      "D:\\Hackthon Projects\\openpools\\blockchain\\artifacts\\contracts\\StudentVerificationLedger.sol\\StudentVerificationLedger.json"
+    ],
+    "buildInfoPath": "D:\\Hackthon Projects\\openpools\\blockchain\\artifacts\\build-info\\solc-0_8_28-def4b72999651ada9ad06b9732396441be4dd9d1.json",
+    "buildInfoOutputPath": "D:\\Hackthon Projects\\openpools\\blockchain\\artifacts\\build-info\\solc-0_8_28-def4b72999651ada9ad06b9732396441be4dd9d1.output.json",
+    "typeFilePath": "D:\\Hackthon Projects\\openpools\\blockchain\\artifacts\\contracts\\StudentVerificationLedger.sol\\artifacts.d.ts",
+    "wasm": false
+  }
+}

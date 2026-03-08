@@ -1,0 +1,167 @@
+{
+  "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "string",
+          "name": "studentId",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "documentHash",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "faceScore",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "verified",
+          "type": "bool"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "timestamp",
+          "type": "uint256"
+        }
+      ],
+      "name": "RecordAdded",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "_studentId",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "_documentHash",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_faceScore",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "_verified",
+          "type": "bool"
+        }
+      ],
+      "name": "addVerificationRecord",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "_studentId",
+          "type": "string"
+        }
+      ],
+      "name": "getStudentHistory",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "studentId",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "documentHash",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "faceScore",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bool",
+              "name": "verified",
+              "type": "bool"
+            },
+            {
+              "internalType": "uint256",
+              "name": "timestamp",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct StudentVerificationLedger.VerificationRecord[]",
+          "name": "",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "_studentId",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_index",
+          "type": "uint256"
+        }
+      ],
+      "name": "getVerificationRecord",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "studentId",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "documentHash",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "faceScore",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bool",
+              "name": "verified",
+              "type": "bool"
+            },
+            {
+              "internalType": "uint256",
+              "name": "timestamp",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct StudentVerificationLedger.VerificationRecord",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+TypeError: Cannot read properties of undefined (reading 'getContractFactory')
+    at main (file:///D:/Hackthon%20Projects/openpools/blockchain/scripts/deploy.js:10:37)
+    at file:///D:/Hackthon%20Projects/openpools/blockchain/scripts/deploy.js:38:1
+
+
