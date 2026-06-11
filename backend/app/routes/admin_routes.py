@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy import func
 from sqlalchemy.orm import Session
@@ -8,19 +8,35 @@ import csv
 import io
 
 from .. import models, schemas
+from ..auth import get_current_student
 from ..database import get_db
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
 
+def require_admin(current_user: models.Student = Depends(get_current_student)):
+    if current_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required",
+        )
+    return current_user
+
+
 @router.get("/students", response_model=list[schemas.AdminStudentListItem])
-def list_students(db: Session = Depends(get_db)):
+def list_students(
+    db: Session = Depends(get_db),
+    _: models.Student = Depends(require_admin),
+):
     students = db.query(models.Student).filter(models.Student.role == "student").all()
     return students
 
 
 @router.get("/auth-logs", response_model=list[schemas.AuthLogOut])
-def list_auth_logs(db: Session = Depends(get_db)):
+def list_auth_logs(
+    db: Session = Depends(get_db),
+    _: models.Student = Depends(require_admin),
+):
     logs = (
         db.query(models.AuthenticationLog)
         .order_by(models.AuthenticationLog.timestamp.desc())
@@ -30,14 +46,17 @@ def list_auth_logs(db: Session = Depends(get_db)):
 
 
 @router.post("/students/{student_id}/revoke")
-def revoke_student_verification(student_id: int, db: Session = Depends(get_db)):
+def revoke_student_verification(
+    student_id: int,
+    db: Session = Depends(get_db),
+    _: models.Student = Depends(require_admin),
+):
     student = db.query(models.Student).filter(models.Student.id == student_id).first()
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
     student.kyc_status = "pending"
     student.face_registered = False
 
-    # Optional: clear the face embedding
     if student.face:
         student.face.face_embedding = "[]"
 
@@ -47,7 +66,10 @@ def revoke_student_verification(student_id: int, db: Session = Depends(get_db)):
 
 
 @router.get("/stats", response_model=schemas.AdminStats)
-def admin_stats(db: Session = Depends(get_db)):
+def admin_stats(
+    db: Session = Depends(get_db),
+    _: models.Student = Depends(require_admin),
+):
     total_students = db.query(func.count(models.Student.id)).scalar() or 0
     kyc_verified = (
         db.query(func.count(models.Student.id))
@@ -72,7 +94,10 @@ def admin_stats(db: Session = Depends(get_db)):
 
 
 @router.get("/export/students")
-def export_students(db: Session = Depends(get_db)):
+def export_students(
+    db: Session = Depends(get_db),
+    _: models.Student = Depends(require_admin),
+):
     students = db.query(models.Student).all()
     output = io.StringIO()
     writer = csv.writer(output)
@@ -92,7 +117,10 @@ def export_students(db: Session = Depends(get_db)):
 
 
 @router.get("/export/auth-logs")
-def export_auth_logs(db: Session = Depends(get_db)):
+def export_auth_logs(
+    db: Session = Depends(get_db),
+    _: models.Student = Depends(require_admin),
+):
     logs = (
         db.query(models.AuthenticationLog)
         .order_by(models.AuthenticationLog.timestamp.desc())

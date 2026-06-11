@@ -33,6 +33,9 @@ class Settings(BaseSettings):
         "http://localhost:8001",
     )
 
+    # Blockchain local node
+    BLOCKCHAIN_RPC_URL: str = os.getenv("BLOCKCHAIN_RPC_URL", "http://127.0.0.1:8545")
+
     class Config:
         case_sensitive = True
 

@@ -29,6 +29,11 @@ def authenticate_student(
 def create_student(
     db: Session, student_in: schemas.StudentRegisterRequest
 ) -> models.Student:
+    if student_in.role == "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin accounts cannot be created via public registration",
+        )
     existing = (
         db.query(models.Student)
         .filter(models.Student.email == student_in.email)

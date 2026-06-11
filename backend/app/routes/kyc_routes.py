@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -37,6 +38,8 @@ def verify_kyc(
         )
 
     student.kyc_status = status_str
+    if status_str == "verified":
+        student.kyc_verified_at = datetime.now(timezone.utc).replace(tzinfo=None)
     db.add(student)
     db.commit()
     db.refresh(student)

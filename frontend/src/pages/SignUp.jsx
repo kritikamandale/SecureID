@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate, Link as RouterLink } from "react-router-dom";
 import {
   Box,
@@ -12,10 +12,6 @@ import {
   IconButton,
   Divider,
   CircularProgress,
-  Tabs,
-  Tab,
-  Grid,
-  Paper,
 } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
 import EmailIcon from "@mui/icons-material/Email";
@@ -29,7 +25,6 @@ import { authApi } from "../services/api";
 
 export default function SignUp() {
   const navigate = useNavigate();
-  const [role, setRole] = useState("student");
   const [form, setForm] = useState({
     full_name: "",
     email: "",
@@ -43,7 +38,6 @@ export default function SignUp() {
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
-  const handleRoleChange = (e, newValue) => setRole(newValue);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -51,10 +45,7 @@ export default function SignUp() {
     setLoading(true);
 
     try {
-      const payload = { ...form, role };
-      // Simulate validation wait
-      await new Promise((r) => setTimeout(r, 500));
-
+      const payload = { ...form, role: "student" };
       const res = await authApi.register(payload);
 
       localStorage.setItem("secureid_student_id", res.data.id);
@@ -137,19 +128,9 @@ export default function SignUp() {
               align="center"
               sx={{ mt: 0.5 }}
             >
-              Join SecureVault Student Identity System
+              Create your SECUREID student account
             </Typography>
           </Box>
-
-          <Tabs
-            value={role}
-            onChange={handleRoleChange}
-            centered
-            sx={{ mb: 3 }}
-          >
-            <Tab label="Student" value="student" sx={{ fontWeight: 600 }} />
-            <Tab label="Admin" value="admin" sx={{ fontWeight: 600 }} />
-          </Tabs>
 
           {error && (
             <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>
@@ -282,7 +263,7 @@ export default function SignUp() {
               {loading ? (
                 <CircularProgress size={22} color="inherit" />
               ) : (
-                `Register as ${role === "student" ? "Student" : "Admin"}`
+                "Create Account"
               )}
             </Button>
           </Box>

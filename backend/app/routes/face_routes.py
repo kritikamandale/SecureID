@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from datetime import datetime, timezone
 from typing import Any
 
 import httpx
@@ -81,6 +82,7 @@ async def enroll_face(
         student.face = models.FaceEmbedding(face_embedding=embedding_json)
 
     student.face_registered = True
+    student.face_enrolled_at = datetime.now(timezone.utc).replace(tzinfo=None)
     db.add(student)
     db.commit()
     db.refresh(student)

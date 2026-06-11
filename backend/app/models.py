@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import (
     Column,
@@ -17,6 +17,10 @@ from sqlalchemy.orm import relationship
 from .database import Base
 
 
+def _utcnow():
+    return datetime.now(timezone.utc).replace(tzinfo=None)
+
+
 class Student(Base):
     __tablename__ = "students"
 
@@ -28,8 +32,10 @@ class Student(Base):
     email = Column(String(255), unique=True, index=True, nullable=False)
     password_hash = Column(String(255), nullable=False)
     kyc_status = Column(String(50), default="pending", nullable=False)
+    kyc_verified_at = Column(DateTime, nullable=True)
     face_registered = Column(Boolean, default=False, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    face_enrolled_at = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, default=_utcnow, nullable=False)
 
     face = relationship("FaceEmbedding", back_populates="student", uselist=False)
     auth_logs = relationship("AuthenticationLog", back_populates="student")
@@ -56,6 +62,6 @@ class AuthenticationLog(Base):
     )
     confidence_score = Column(Float, nullable=False)
     success = Column(Boolean, default=False, nullable=False)
-    timestamp = Column(DateTime, default=datetime.utcnow, nullable=False)
+    timestamp = Column(DateTime, default=_utcnow, nullable=False)
 
     student = relationship("Student", back_populates="auth_logs")

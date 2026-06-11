@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Box,
   Container,
@@ -9,7 +9,7 @@ import {
   Card,
   CardContent,
   Grid,
-  Button,
+  CircularProgress,
 } from "@mui/material";
 import Dashboard from "./Dashboard";
 import StudentList from "./StudentList";
@@ -21,6 +21,7 @@ import CloudQueueIcon from "@mui/icons-material/CloudQueue";
 import LinkIcon from "@mui/icons-material/Link";
 import SecurityIcon from "@mui/icons-material/Security";
 import DeveloperBoardIcon from "@mui/icons-material/DeveloperBoard";
+import { adminApi } from "../../services/api";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -34,6 +35,98 @@ function TabPanel(props) {
     >
       {value === index && <Box sx={{ pt: 3 }}>{children}</Box>}
     </div>
+  );
+}
+
+function BlockchainExplorer() {
+  const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    adminApi
+      .students()
+      .then((r) => setStudents(r.data))
+      .catch(() => setStudents([]))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const enrolledStudents = students.filter((s) => s.face_registered);
+
+  if (loading)
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
+        <CircularProgress />
+      </Box>
+    );
+
+  return (
+    <Box>
+      <Typography variant="h6" fontWeight={700} mb={2}>
+        Students with Blockchain Records
+      </Typography>
+      {enrolledStudents.length === 0 ? (
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            py: 6,
+            gap: 1,
+          }}
+        >
+          <LinkIcon sx={{ fontSize: 48, color: "text.disabled" }} />
+          <Typography variant="body1" color="text.secondary" fontWeight={500}>
+            No blockchain records yet
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Records appear here after students complete face authentication.
+          </Typography>
+        </Box>
+      ) : (
+        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
+          {enrolledStudents.map((s) => (
+            <Box
+              key={s.id}
+              sx={{
+                p: 2.5,
+                minWidth: 220,
+                border: "1px solid",
+                borderColor: "divider",
+                borderRadius: 2,
+                bgcolor: "#1e1e2d",
+                color: "#fff",
+              }}
+            >
+              <Typography
+                variant="subtitle1"
+                fontWeight={700}
+                sx={{ color: "#90caf9", mb: 0.5 }}
+              >
+                {s.name}
+              </Typography>
+              <Typography
+                variant="body2"
+                sx={{ fontFamily: "monospace", opacity: 0.8 }}
+              >
+                {s.email}
+              </Typography>
+              <Box sx={{ mt: 1, display: "flex", gap: 1 }}>
+                <Chip
+                  size="small"
+                  label="KYC Verified"
+                  sx={{ bgcolor: "rgba(0,200,83,0.2)", color: "#69F0AE", fontSize: "0.65rem" }}
+                />
+                <Chip
+                  size="small"
+                  label="Face Enrolled"
+                  sx={{ bgcolor: "rgba(124,77,255,0.2)", color: "#B47CFF", fontSize: "0.65rem" }}
+                />
+              </Box>
+            </Box>
+          ))}
+        </Box>
+      )}
+    </Box>
   );
 }
 
@@ -67,7 +160,7 @@ export default function AdminPortal() {
               }}
             />
             <Typography variant="h4" fontWeight={800} color="text.primary">
-              SecureVault Administration
+              SECUREID Administration
             </Typography>
             <Typography variant="body1" color="text.secondary">
               Global overview, user management, and system health.
@@ -150,109 +243,7 @@ export default function AdminPortal() {
             sx={{ borderRadius: 3, boxShadow: "0 4px 20px rgba(0,0,0,0.05)" }}
           >
             <CardContent sx={{ p: 4 }}>
-              <Typography variant="h5" fontWeight={700} mb={3}>
-                Blockchain Explorer
-              </Typography>
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 2,
-                  overflowX: "auto",
-                  pb: 2,
-                }}
-              >
-                {[
-                  {
-                    b: 19849855,
-                    t: "0x8fa...d21",
-                    h: "b2c7...8e1a",
-                    genesis: true,
-                  },
-                  { b: 19849856, t: "0x91c...f8b", h: "1a9f...c28d" },
-                  { b: 19849857, t: "0xa2d...e9c", h: "7f4c...3b1d" },
-                  { b: 19849858, t: "0xb3e...a0d", h: "4e1a...7c9b" },
-                  { b: "Pending", t: "Processing...", h: "Computing..." },
-                ].map((block, i) => (
-                  <Box key={i} sx={{ display: "flex", alignItems: "center" }}>
-                    <Box
-                      sx={{
-                        p: 2.5,
-                        minWidth: 220,
-                        border: "1px solid",
-                        borderColor: "divider",
-                        borderRadius: 2,
-                        bgcolor:
-                          block.b === "Pending"
-                            ? "background.paper"
-                            : "#1e1e2d",
-                        color:
-                          block.b === "Pending" ? "text.secondary" : "#fff",
-                        position: "relative",
-                      }}
-                    >
-                      {block.genesis && (
-                        <Chip
-                          size="small"
-                          label="Genesis"
-                          sx={{
-                            position: "absolute",
-                            top: -10,
-                            right: -10,
-                            bgcolor: "#7c4dff",
-                            color: "#fff",
-                            fontSize: "0.65rem",
-                          }}
-                        />
-                      )}
-                      <Typography
-                        variant="subtitle1"
-                        fontWeight={700}
-                        sx={{
-                          color:
-                            block.b === "Pending"
-                              ? "text.secondary"
-                              : "#90caf9",
-                          mb: 1,
-                        }}
-                      >
-                        Block #{block.b}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        sx={{ fontFamily: "monospace", opacity: 0.9 }}
-                      >
-                        Tx: {block.t}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        sx={{ fontFamily: "monospace", opacity: 0.9 }}
-                      >
-                        Hash: {block.h}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        sx={{ fontFamily: "monospace", opacity: 0.7, mt: 1 }}
-                      >
-                        {block.b === "Pending"
-                          ? "Awaiting consensus..."
-                          : "Verified by 24 nodes"}
-                      </Typography>
-                    </Box>
-                    {i < 4 && (
-                      <Box
-                        sx={{
-                          mx: 2,
-                          color: "text.secondary",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        →
-                      </Box>
-                    )}
-                  </Box>
-                ))}
-              </Box>
+              <BlockchainExplorer />
             </CardContent>
           </Card>
         </TabPanel>
@@ -280,11 +271,11 @@ export default function AdminPortal() {
                 }}
               />
               <Typography variant="h6" color="text.secondary">
-                CI/CD Pipeline Status Logging
+                CI/CD Pipeline
               </Typography>
-              <Typography variant="body2" color="text.secondary">
-                GitHub Actions currently passing. All containers deployed to
-                simulated production environment.
+              <Typography variant="body2" color="text.secondary" align="center">
+                Run tests locally with <code>pytest</code> in <code>backend/</code> and <code>face-service/</code>.
+                Docker images build via <code>docker compose up --build</code>.
               </Typography>
             </CardContent>
           </Card>
@@ -313,11 +304,12 @@ export default function AdminPortal() {
                 }}
               />
               <Typography variant="h6" color="success.main">
-                System SECURE
+                System Secured
               </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Zero-trust architecture enforced. JWT active. Passwords bcrypt
-                hashed. Embeddings AES-256 encrypted.
+              <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 1, maxWidth: 400 }}>
+                JWT bearer tokens on all protected routes · Passwords hashed with bcrypt ·
+                Admin endpoints require admin role · CORS restricted to configured origins ·
+                Admin self-registration blocked
               </Typography>
             </CardContent>
           </Card>
@@ -329,28 +321,35 @@ export default function AdminPortal() {
           >
             <CardContent sx={{ p: 4 }}>
               <Typography variant="h5" fontWeight={700} mb={3}>
-                Technology Stack Overview
+                Technology Stack
               </Typography>
               <Grid container spacing={3}>
                 {[
-                  "React.js (Frontend)",
-                  "FastAPI (Backend)",
-                  "PostgreSQL (Database)",
-                  "JWT (Auth)",
-                  "Docker (Container)",
-                  "Python OpenCV (Biometrics)",
+                  { label: "React 18 + Vite", desc: "Frontend SPA" },
+                  { label: "FastAPI", desc: "Backend REST API" },
+                  { label: "SQLAlchemy + SQLite/PostgreSQL", desc: "Database ORM" },
+                  { label: "JWT (python-jose)", desc: "Authentication" },
+                  { label: "DeepFace", desc: "Face recognition microservice" },
+                  { label: "Hardhat + Solidity", desc: "Blockchain ledger" },
+                  { label: "Material UI v7", desc: "Component library" },
+                  { label: "Docker Compose", desc: "Local orchestration" },
+                  { label: "bcrypt (passlib)", desc: "Password hashing" },
                 ].map((tech) => (
-                  <Grid item xs={6} md={4} key={tech}>
+                  <Grid item xs={6} md={4} key={tech.label}>
                     <Box
                       sx={{
-                        p: 3,
+                        p: 2.5,
                         border: "1px solid",
                         borderColor: "divider",
                         borderRadius: 2,
-                        textAlign: "center",
                       }}
                     >
-                      <Typography fontWeight={600}>{tech}</Typography>
+                      <Typography fontWeight={700} variant="body2">
+                        {tech.label}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {tech.desc}
+                      </Typography>
                     </Box>
                   </Grid>
                 ))}

@@ -7,11 +7,6 @@ from pydantic import BaseModel, EmailStr, StringConstraints
 
 
 # ----- Auth & Student -----
-class StudentResponse(BaseModel):
-    id: int
-    name: str
-    email: str
-
 
 # Schema for the /auth/register endpoint — field names match the frontend form
 class StudentRegisterRequest(BaseModel):
@@ -29,10 +24,6 @@ class StudentBase(BaseModel):
     role: str = "student"
     student_id_str: Optional[str] = None
     university: Optional[str] = None
-
-
-class StudentCreate(StudentBase):
-    password: Annotated[str, StringConstraints(min_length=8)]
 
 
 class StudentLogin(BaseModel):
@@ -53,12 +44,6 @@ class StudentOut(StudentBase):
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
-
-
-class TokenData(BaseModel):
-    student_id: Optional[int] = None
-    email: Optional[EmailStr] = None
-    role: Optional[str] = None
 
 
 # ----- KYC -----

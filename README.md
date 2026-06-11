@@ -1,246 +1,236 @@
-## SECUREID – AI Powered Student Identity Verification Platform
+# SECUREID — AI-Powered Student Identity Verification Platform
 
-SECUREID is a full-stack, production-style platform for **secure university student verification** using:
+SECUREID is a full-stack platform for **secure university student identity verification** combining AI facial recognition, KYC document checks, JWT authentication, blockchain audit trail, and a real-time admin dashboard.
 
-- **KYC verification (mocked Aadhaar + ID card upload)**
-- **AI facial authentication (DeepFace microservice)**
-- **JWT-based authentication**
-- **Admin analytics dashboard**
-- **Microservices + Docker + Terraform + GitHub Actions**
-
-This project is structured for hackathon demos where judges can run the full flow:
-
-Register → KYC → Face Enroll → Face Authenticate → Admin Dashboard.
+**Demo flow:** Register → KYC → Face Enroll → Face Authenticate → Dashboard
 
 ---
 
-### Monorepo structure
+## Project Structure
 
-- `backend/` – FastAPI API, PostgreSQL (SQLAlchemy), JWT auth, KYC, face, admin APIs
-- `face-service/` – FastAPI microservice using DeepFace for embeddings and cosine similarity
-- `frontend/` – React + Vite + Tailwind student portal and admin dashboard
-- `devops/docker-compose.yml` – Local orchestration for backend, face-service, frontend, Postgres
-- `devops/terraform/` – Basic AWS EC2 + RDS + security group infrastructure as code
-- `.github/workflows/ci-cd.yml` – GitHub Actions CI (tests + Docker image builds)
-
----
-
-### Backend overview (`backend/app`)
-
-- `main.py` – FastAPI app, CORS, router registration, DB schema creation
-- `config.py` – Settings (DB URL, JWT secret, CORS, face-service URL) via Pydantic
-- `database.py` – SQLAlchemy engine, `SessionLocal`, `Base`, dependency `get_db`
-- `models.py` – `Student`, `FaceEmbedding`, `AuthenticationLog`
-- `schemas.py` – Pydantic models (auth, KYC, face, admin stats)
-- `utils.py` – bcrypt hashing + JWT access token generation
-- `auth.py` – registration helper, `authenticate_student`, `get_current_student` (JWT guard)
-- `routes/auth_routes.py`
-  - `POST /auth/register` – create student, hash password
-  - `POST /auth/login` – return JWT bearer token
-- `routes/kyc_routes.py`
-  - `POST /kyc/verify` – mock Aadhaar validation (length == 12 ⇒ `"verified"`, else `"rejected"`)
-- `routes/face_routes.py`
-  - `POST /face/enroll` – send selfie to AI microservice, store embedding + mark `face_registered`
-  - `POST /face/authenticate` – compare live image vs stored embedding, log result
-- `routes/admin_routes.py`
-  - `GET /admin/students` – list all students with statuses
-  - `GET /admin/auth-logs` – authentication logs
-  - `GET /admin/stats` – aggregate counts for dashboard
-- `tests/test_auth_and_kyc.py` – pytest integration tests (JWT + KYC) using SQLite
-
-Security:
-
-- JWT bearer tokens (`Authorization: Bearer <token>`)
-- Passwords hashed via `passlib[bcrypt]`
-- Input validation via Pydantic schemas
-- CORS configured to allow the frontend origin
+```
+SecureID/
+├── backend/          # FastAPI REST API (Python)
+├── face-service/     # DeepFace microservice (Python)
+├── frontend/         # React 18 + MUI SPA
+├── blockchain/       # Hardhat + Solidity smart contract
+└── devops/           # Docker Compose for local orchestration
+```
 
 ---
 
-### AI face microservice (`face-service/`)
+## Tech Stack
 
-- `app.py` – FastAPI service:
-  - `POST /generate-embedding` – returns embedding vector for base64 image
-  - `POST /compare-face` – cosine similarity against stored embedding
-  - `GET /health` – health check
-- `face_utils.py`
-  - `load_image_from_base64` – decode base64 to `PIL.Image`
-  - `generate_embedding` – DeepFace embedding (with graceful fallback if DeepFace unavailable)
-  - `cosine_similarity` – vector similarity
-  - `compare_face` – similarity → `verified` + confidence %
-- `tests/test_face_utils.py` – unit test for cosine similarity
-
-DeepFace is used when available; otherwise a deterministic fallback embedding keeps the service usable in constrained environments.
+| Layer | Technology |
+|-------|-----------|
+| Frontend | React 18, Vite, Material UI v7, React Router v6 |
+| Backend | FastAPI, SQLAlchemy, Pydantic v2, python-jose, passlib/bcrypt |
+| Face AI | DeepFace microservice (cosine similarity, graceful fallback) |
+| Database | SQLite (local dev) / PostgreSQL (Docker / production) |
+| Auth | JWT Bearer tokens |
+| Blockchain | Hardhat + Solidity (local node), Web3.py |
+| QR Code | qrcode.react |
+| Container | Docker Compose |
 
 ---
 
-### Frontend (`frontend/`)
+## Backend (`backend/app`)
 
-Tech stack:
+### Routes
 
-- React 18, Vite, React Router
-- TailwindCSS
-- Axios (with JWT bearer injection)
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| POST | `/auth/register` | — | Register a student account |
+| POST | `/auth/login` | — | Login, returns JWT |
+| POST | `/kyc/verify` | JWT | Submit Aadhaar + ID card for KYC |
+| POST | `/face/enroll` | JWT | Enroll face biometric |
+| POST | `/face/authenticate` | JWT | Authenticate via live selfie |
+| GET | `/student/timeline` | JWT | Fetch personal verification timeline |
+| GET | `/verification/history/{id}` | JWT | Blockchain verification history |
+| GET | `/admin/students` | JWT + Admin | List all students |
+| GET | `/admin/stats` | JWT + Admin | Aggregate stats |
+| GET | `/admin/auth-logs` | JWT + Admin | All authentication logs |
+| POST | `/admin/students/{id}/revoke` | JWT + Admin | Revoke student verification |
+| GET | `/admin/export/students` | JWT + Admin | Export CSV |
+| GET | `/admin/export/auth-logs` | JWT + Admin | Export CSV |
+| GET | `/health` | — | Health check |
 
-Key files:
+### Key Files
 
-- `src/services/api.js`
-  - Axios instance with `VITE_API_BASE_URL` (defaults to `http://localhost:8000`)
-  - `authApi`, `kycApi`, `faceApi`, `adminApi` helpers
-- `src/components/Navbar.jsx` – top navigation (student + admin + auth links)
-- `src/components/StudentCard.jsx`, `StatusBadge.jsx` – admin UI components
-- `src/pages/Login.jsx` – email/password login, saves JWT to `localStorage`
-- `src/pages/Register.jsx` – student registration, stores `student_id` in `localStorage`
-- `src/pages/KYCUpload.jsx`
-  - Aadhaar input + ID card upload → base64 → `POST /kyc/verify`
-- `src/pages/FaceEnroll.jsx`
-  - Uses `navigator.mediaDevices.getUserMedia` to access webcam
-  - Captures frame to canvas, converts to base64 → `POST /face/enroll`
-- `src/pages/FaceAuth.jsx`
-  - Same webcam capture flow → `POST /face/authenticate`, displays result + confidence
-- `src/pages/admin/Dashboard.jsx` – stats from `GET /admin/stats`
-- `src/pages/admin/StudentList.jsx` – uses `StudentCard` + `GET /admin/students`
-- `src/pages/admin/AuthLogs.jsx` – table from `GET /admin/auth-logs`
-- `src/App.jsx` – router wiring:
-  - `/register`, `/login`, `/dashboard` (student journey)
-  - `/admin` (dashboard + student list + logs)
+- `main.py` — App setup, CORS (reads `settings.BACKEND_CORS_ORIGINS`), lifespan
+- `config.py` — All settings via env vars with defaults; warns on weak JWT secret at startup
+- `models.py` — `Student`, `FaceEmbedding`, `AuthenticationLog` (with event timestamps)
+- `auth.py` — Registration (blocks admin role), login, JWT guard dependency
+- `utils.py` — bcrypt hashing, JWT generation
+- `routes/admin_routes.py` — All admin endpoints require valid JWT + `role == "admin"`
+- `blockchain_service.py` — Connects to local Hardhat node (configurable via `BLOCKCHAIN_RPC_URL`)
 
-Tailwind is configured in `tailwind.config.js` and `src/index.css`.
+### Security
+- Passwords hashed with bcrypt via `passlib`
+- JWT Bearer tokens (HS256), expiry configurable
+- Admin routes protected by `require_admin` dependency (JWT + role check)
+- Public registration blocks `role: admin` — admin accounts must be created directly in the DB
+- CORS origins configurable via `FRONTEND_ORIGIN` / `FRONTEND_ORIGIN_DOCKER` env vars
+- Startup warning if `JWT_SECRET_KEY` is the default value; raises error in production
 
 ---
 
-### Docker & docker-compose (`devops/docker-compose.yml`)
+## AI Face Microservice (`face-service/`)
 
-Services:
+- `POST /generate-embedding` — Returns face embedding vector for a base64 image
+- `POST /compare-face` — Cosine similarity vs stored embedding → `verified` + confidence score
+- `GET /health` — Health check
 
-- `db` – PostgreSQL 15
-  - DB: `secureid`, user: `secureid` / password: `secureid`
-- `face-service` – DeepFace microservice on `:8001`
-- `backend` – FastAPI backend on `:8000`
-  - `DATABASE_URL=postgresql+psycopg2://secureid:secureid@db:5432/secureid`
-  - `FACE_SERVICE_URL=http://face-service:8001`
-  - `JWT_SECRET_KEY` set for container
-- `frontend` – built React app served via `serve` on `:5173`
+Uses DeepFace when available; falls back to a deterministic embedding for environments without GPU/model files.
 
-All services are connected on the `secureid-net` bridge network.
+---
 
-Run everything locally:
+## Frontend (`frontend/`)
+
+### Pages & Routes
+
+| Route | Component | Access |
+|-------|-----------|--------|
+| `/` | `HomePage` | Public |
+| `/login` | `SignIn` | Public |
+| `/register` | `SignUp` | Public |
+| `/verify` | `VerificationFlow` | Authenticated students |
+| `/dashboard` | `StudentDashboard` | Authenticated students |
+| `/verification-history` | `StudentVerificationHistory` | Authenticated students |
+| `/admin` | `AdminPortal` | Authenticated admins only |
+
+### Key Components
+
+- `Navbar` — Role-aware nav links (Admin link only for admin role); mobile slide-out drawer
+- `ProtectedRoute` — Redirects unauthenticated users to `/login`
+- `StudentIDCard` — Digital ID card with QR code
+- `SystemStatus` — Live health check for backend and face service
+- `Timeline` — Chronological verification event list
+
+### Environment Variables (copy `frontend/.env.example` → `.env.local`)
+
+```env
+VITE_API_BASE_URL=http://localhost:8000
+VITE_FACE_SERVICE_URL=http://localhost:8001
+```
+
+---
+
+## Blockchain (`blockchain/`)
+
+Hardhat project with `StudentVerificationLedger.sol` — a Solidity contract that records a SHA-256 hash of each verification event (student ID + document hash + face score) on a local chain.
+
+The backend calls the contract after each successful `POST /face/authenticate`.
+
+```bash
+cd blockchain
+npm install
+npx hardhat node          # start local chain on :8545
+npx hardhat run scripts/deploy.js --network localhost
+```
+
+The deployed contract address and ABI are saved to `backend/app/blockchain_data/contract_info.json`.
+
+---
+
+## Running Locally (without Docker)
+
+### 1. Backend
+
+```bash
+cd backend
+python -m venv .venv
+# Windows: .venv\Scripts\activate  |  macOS/Linux: source .venv/bin/activate
+pip install -r requirements.txt
+
+# Copy and edit environment variables
+copy .env.example .env
+
+# Start (SQLite used by default in .env.example)
+uvicorn app.main:app --reload --port 8000
+```
+
+API docs: `http://localhost:8000/docs`
+
+### 2. Face Microservice
+
+```bash
+cd face-service
+python -m venv .venv
+pip install -r requirements.txt
+uvicorn app:app --reload --port 8001
+```
+
+### 3. Frontend
+
+```bash
+cd frontend
+npm install
+cp .env.example .env.local   # edit if ports differ
+npm run dev
+```
+
+App: `http://localhost:5173`
+
+---
+
+## Running with Docker Compose
 
 ```bash
 cd devops
 docker compose up --build
 ```
 
-Then:
-
-- Backend API: `http://localhost:8000/docs`
-- Face service: `http://localhost:8001/docs`
-- Frontend UI: `http://localhost:5173`
-
----
-
-### GitHub Actions CI/CD (`.github/workflows/ci-cd.yml`)
-
-Pipeline stages:
-
-- **backend-and-face-tests**
-  - Sets `DATABASE_URL=sqlite:///./test.db` and `JWT_SECRET_KEY`
-  - Installs backend deps and runs `pytest` in `backend/`
-  - Installs face-service deps and runs `pytest` in `face-service/`
-- **build-docker-images**
-  - Builds Docker images:
-    - `secureid-backend`
-    - `secureid-face-service`
-    - `secureid-frontend`
-- **deploy**
-  - Placeholder step ready to integrate with AWS ECS/EC2 or another platform
+| Service | URL |
+|---------|-----|
+| Frontend | http://localhost:5173 |
+| Backend API | http://localhost:8000/docs |
+| Face Service | http://localhost:8001/docs |
 
 ---
 
-### Terraform IaC (`devops/terraform/`)
+## Environment Variables Reference
 
-This directory contains a minimal AWS infrastructure definition:
+### Backend (`backend/.env`)
 
-- `variables.tf`
-  - Region, project name, DB credentials, EC2 instance type, SSH key name
-- `main.tf`
-  - AWS provider + default VPC data source
-  - Security group (`aws_security_group.secureid_sg`) for HTTP/HTTPS/SSH
-  - `aws_db_instance.secureid_db` – PostgreSQL RDS instance
-  - `aws_instance.secureid_app` – EC2 instance (user data installs Docker)
-  - Outputs: app instance public IP and DB endpoint
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `ENV` | `development` | Set to `production` to enforce strong JWT secret |
+| `DATABASE_URL` | SQLite | PostgreSQL or SQLite connection string |
+| `JWT_SECRET_KEY` | `CHANGE_ME_SUPER_SECRET` | **Must be changed in production** |
+| `FRONTEND_ORIGIN` | `http://localhost:5173` | Allowed CORS origin |
+| `FACE_SERVICE_URL` | `http://localhost:8001` | Face microservice URL |
+| `BLOCKCHAIN_RPC_URL` | `http://127.0.0.1:8545` | Hardhat / EVM-compatible node |
 
-Usage:
+### Frontend (`frontend/.env.local`)
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `VITE_API_BASE_URL` | `http://localhost:8000` | Backend API base URL |
+| `VITE_FACE_SERVICE_URL` | `http://localhost:8001` | Face service URL (health check) |
+
+---
+
+## Demo Flow
+
+1. **Register** — Go to `/register`, create a student account (30 seconds)
+2. **Login** — Sign in at `/login`; redirected to `/verify` if KYC/face are incomplete
+3. **KYC** — Enter a 12-digit Aadhaar (e.g. `123456789012`) and upload any image as ID card → status becomes `verified`
+4. **Face Enroll** — Allow webcam, centre your face, click **Capture & Enroll**
+5. **Face Authenticate** — Capture a fresh frame → see `verified: true` with confidence score; a blockchain record is created
+6. **Dashboard** — View identity card, blockchain history, and authentication log at `/dashboard`
+7. **Admin** — Log in with an admin account and visit `/admin` for stats, student management, and auth logs
+
+---
+
+## Tests
 
 ```bash
-cd devops/terraform
-terraform init
-terraform plan -var="db_password=YOUR_DB_PASSWORD" -var="ssh_key_name=YOUR_KEY_NAME"
-terraform apply -var="db_password=YOUR_DB_PASSWORD" -var="ssh_key_name=YOUR_KEY_NAME"
-```
-
-You would then point the backend `DATABASE_URL` at the RDS endpoint and deploy your Dockerized services onto the EC2 instance.
-
----
-
-### Running the system locally (non-Docker)
-
-1. **Backend**
-
-```bash
+# Backend
 cd backend
-python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
+pytest tests/
 
-# For quick local dev you can use SQLite:
-export DATABASE_URL="sqlite:///./secureid.db"
-export JWT_SECRET_KEY="dev-secret-key"
-uvicorn app.main:app --reload --port 8000
-```
-
-2. **Face microservice**
-
-```bash
+# Face service
 cd face-service
-python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-uvicorn app:app --reload --port 8001
+pytest tests/
 ```
-
-3. **Frontend**
-
-```bash
-cd frontend
-npm install
-npm run dev -- --host 0.0.0.0 --port 5173
-```
-
-Ensure `VITE_API_BASE_URL` (or the default `http://localhost:8000`) points to your backend.
-
----
-
-### Demo flow for judges
-
-1. **Register**
-   - Open `http://localhost:5173`
-   - Go to **Register** and create a student
-2. **Login**
-   - Login with the same email/password
-3. **KYC Verification**
-   - On **Student Dashboard**, go to the KYC section
-   - Enter a 12-digit Aadhaar (e.g. `123456789012`) and upload any image as the ID card
-   - Status should return `"verified"`
-4. **Face Enrollment**
-   - Use the **Face Enrollment** card
-   - Allow webcam access, center your face, and click **Capture & Enroll**
-5. **Face Authentication**
-   - Move to **Face Authentication**
-   - Capture a fresh frame and verify
-   - You should see `verified: true` with a confidence score
-6. **Admin Dashboard**
-   - Navigate to `/admin`
-   - See stats, student list (with KYC + face status), and authentication logs (including confidence scores and timestamps)
-
-This completes the end-to-end **SECUREID – AI Powered Student Identity Verification Platform** demo.

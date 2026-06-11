@@ -57,8 +57,7 @@ export default function StudentVerificationHistory() {
     <Box
       sx={{
         p: 4,
-        backgroundImage: "url('/blockchain-bg.svg')",
-        backgroundColor: "#f8f9fa",
+        bgcolor: "background.default",
         minHeight: "100vh",
       }}
     >

@@ -4,7 +4,8 @@ import hashlib
 from datetime import datetime
 from web3 import Web3
 
-w3 = Web3(Web3.HTTPProvider("http://127.0.0.1:8545"))
+_BLOCKCHAIN_RPC_URL = os.getenv("BLOCKCHAIN_RPC_URL", "http://127.0.0.1:8545")
+w3 = Web3(Web3.HTTPProvider(_BLOCKCHAIN_RPC_URL))
 
 
 def _get_contract():

@@ -4,7 +4,8 @@ import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 
 const BACKEND_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
-const FACE_URL = "http://localhost:8001";
+const FACE_URL =
+  import.meta.env.VITE_FACE_SERVICE_URL || "http://localhost:8001";
 
 async function checkHealth(url) {
   try {

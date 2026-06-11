@@ -14,6 +14,7 @@ import {
   TableHead,
   TableRow,
   Button,
+  CircularProgress,
 } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -23,60 +24,46 @@ import MemoryIcon from "@mui/icons-material/Memory";
 import GppGoodIcon from "@mui/icons-material/GppGood";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorIcon from "@mui/icons-material/Error";
+import LinkIcon from "@mui/icons-material/Link";
 
 export default function StudentDashboard() {
   const { userName, userEmail, studentId } = useAuth();
   const [timeline, setTimeline] = useState([]);
+  const [blockchainHistory, setBlockchainHistory] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Derived state for the cards based on timeline log
-  const kycStatus = timeline.find((t) => t.type === "kyc")
-    ? "Verified"
-    : "Pending";
+  const kycStatus = timeline.find((t) => t.type === "kyc") ? "Verified" : "Pending";
   const faceEnrolled = timeline.find((t) => t.type === "face_enrollment");
   const authLogs = timeline.filter((t) => t.type === "authentication");
   const latestAuth = authLogs.length > 0 ? authLogs[0] : null;
 
   useEffect(() => {
-    const fetchTimeline = async () => {
+    const fetchData = async () => {
       try {
-        const res = await studentApi.getTimeline();
-        setTimeline(res.data);
+        const timelineRes = await studentApi.getTimeline();
+        setTimeline(timelineRes.data);
+
+        if (studentId) {
+          try {
+            const historyRes = await studentApi.getVerificationHistory(studentId);
+            setBlockchainHistory(historyRes.data.history || []);
+          } catch {
+            setBlockchainHistory([]);
+          }
+        }
       } catch (err) {
-        console.error("Failed to fetch timeline:", err);
+        console.error("Failed to fetch dashboard data:", err);
       } finally {
         setIsLoading(false);
       }
     };
-    fetchTimeline();
-  }, []);
-
-  // Blockchain Mock Data
-  const blocks = [
-    {
-      blockNum: 19849855,
-      txId: "0x8fa...d21",
-      hash: "b2c7...8e1a",
-      genesis: true,
-    },
-    {
-      blockNum: 19849856,
-      txId: "0x91c...f8b",
-      hash: "1a9f...c28d",
-      genesis: false,
-    },
-    {
-      blockNum: "Pending",
-      txId: "Processing...",
-      hash: "Computing...",
-      genesis: false,
-    },
-  ];
+    fetchData();
+  }, [studentId]);
 
   if (isLoading)
     return (
-      <Box p={4}>
-        <Typography>Loading Dashboard...</Typography>
+      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "60vh" }}>
+        <CircularProgress />
       </Box>
     );
 
@@ -190,15 +177,6 @@ export default function StudentDashboard() {
                     {kycStatus}
                   </Typography>
                 </Box>
-                {kycStatus === "Verified" && (
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ mt: 1 }}
-                  >
-                    Score: 0.92
-                  </Typography>
-                )}
               </CardContent>
             </Card>
           </Grid>
@@ -272,85 +250,100 @@ export default function StudentDashboard() {
         >
           <CardContent sx={{ p: 3 }}>
             <Typography variant="h6" fontWeight={700} mb={3}>
-              Blockchain Record Section
+              Blockchain Verification Records
             </Typography>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 2,
-                overflowX: "auto",
-                pb: 2,
-              }}
-            >
-              {blocks.map((b, i) => (
-                <Box key={i} sx={{ display: "flex", alignItems: "center" }}>
-                  <Box
-                    sx={{
-                      p: 2,
-                      minWidth: 200,
-                      border: "1px solid #e0e0e0",
-                      borderRadius: 2,
-                      bgcolor: b.blockNum === "Pending" ? "#f5f5f5" : "#1e1e2d",
-                      color: b.blockNum === "Pending" ? "#333" : "#fff",
-                      position: "relative",
-                    }}
-                  >
-                    {b.genesis && (
-                      <Chip
-                        size="small"
-                        label="Genesis"
-                        sx={{
-                          position: "absolute",
-                          top: -10,
-                          right: -10,
-                          bgcolor: "#7c4dff",
-                          color: "#fff",
-                          fontSize: "0.65rem",
-                        }}
-                      />
-                    )}
-                    <Typography
-                      variant="subtitle2"
-                      fontWeight={700}
-                      sx={{
-                        color:
-                          b.blockNum === "Pending"
-                            ? "text.secondary"
-                            : "#90caf9",
-                      }}
-                    >
-                      Block #{b.blockNum}
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      display="block"
-                      sx={{ mt: 1, fontFamily: "monospace" }}
-                    >
-                      Tx: {b.txId}
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      display="block"
-                      sx={{ fontFamily: "monospace" }}
-                    >
-                      Hash: {b.hash}
-                    </Typography>
-                  </Box>
-                  {i < blocks.length - 1 && (
+
+            {blockchainHistory.length === 0 ? (
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  py: 4,
+                  gap: 1,
+                }}
+              >
+                <LinkIcon sx={{ fontSize: 40, color: "text.disabled" }} />
+                <Typography variant="body2" color="text.secondary">
+                  No on-chain records yet. Complete face authentication to create your first blockchain entry.
+                </Typography>
+              </Box>
+            ) : (
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 2,
+                  overflowX: "auto",
+                  pb: 2,
+                }}
+              >
+                {blockchainHistory.map((record, i) => (
+                  <Box key={i} sx={{ display: "flex", alignItems: "center" }}>
                     <Box
                       sx={{
-                        mx: 2,
-                        color: "text.secondary",
-                        fontWeight: "bold",
+                        p: 2,
+                        minWidth: 220,
+                        border: "1px solid #e0e0e0",
+                        borderRadius: 2,
+                        bgcolor: "#1e1e2d",
+                        color: "#fff",
+                        position: "relative",
                       }}
                     >
-                      →
+                      {i === 0 && (
+                        <Chip
+                          size="small"
+                          label="Latest"
+                          sx={{
+                            position: "absolute",
+                            top: -10,
+                            right: -10,
+                            bgcolor: "#7c4dff",
+                            color: "#fff",
+                            fontSize: "0.65rem",
+                          }}
+                        />
+                      )}
+                      <Typography
+                        variant="subtitle2"
+                        fontWeight={700}
+                        sx={{ color: "#90caf9" }}
+                      >
+                        {record.verified ? "✓ Verified" : "✗ Failed"}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        display="block"
+                        sx={{ mt: 1, fontFamily: "monospace", opacity: 0.8, wordBreak: "break-all" }}
+                      >
+                        Hash: {record.documentHash?.slice(0, 18)}…
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        display="block"
+                        sx={{ fontFamily: "monospace", opacity: 0.7 }}
+                      >
+                        Score: {record.faceScore}%
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        display="block"
+                        sx={{ opacity: 0.6, mt: 0.5 }}
+                      >
+                        {new Date(record.timestamp * 1000).toLocaleDateString("en-IN")}
+                      </Typography>
                     </Box>
-                  )}
-                </Box>
-              ))}
-            </Box>
+                    {i < blockchainHistory.length - 1 && (
+                      <Box sx={{ mx: 2, color: "text.secondary", fontWeight: "bold" }}>
+                        →
+                      </Box>
+                    )}
+                  </Box>
+                ))}
+              </Box>
+            )}
+
             <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
               <Button
                 component={RouterLink}

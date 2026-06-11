@@ -33,7 +33,7 @@ def get_student_timeline(
             {
                 "type": "kyc",
                 "title": f"KYC Status: {current_student.kyc_status.capitalize()}",
-                "timestamp": current_student.created_at,  # simplified, using created_at
+                "timestamp": current_student.kyc_verified_at or current_student.created_at,
                 "detail": "Document verification process.",
             }
         )
@@ -44,7 +44,7 @@ def get_student_timeline(
             {
                 "type": "face_enrollment",
                 "title": "Face Enrolled Successfully",
-                "timestamp": current_student.created_at,  # simplified
+                "timestamp": current_student.face_enrolled_at or current_student.created_at,
                 "detail": "Facial biometrics registered securely.",
             }
         )
