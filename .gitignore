@@ -5,3 +5,6 @@ build/
 coverage/
 logs/
 *.log
+__pycache__/
+*.pyc
+backend/secureid.db
