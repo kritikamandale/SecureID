@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import base64
 import io
+import os
 from typing import List
 
 import numpy as np
@@ -12,6 +13,24 @@ try:
 except Exception:  # pragma: no cover - optional heavy dependency
     DeepFace = None  # type: ignore
 
+# ~7.5 MB decoded image limit; base64 overhead is ~33%
+_MAX_IMAGE_B64_BYTES = 10 * 1_024 * 1_024
+
+FACE_MODEL = os.getenv("FACE_MODEL", "Facenet")
+
+
+def _get_match_threshold() -> float:
+    # Default 0.60 cosine similarity == 0.40 cosine distance, matching DeepFace's Facenet defaults
+    raw = os.getenv("FACE_MATCH_THRESHOLD", "0.60")
+    try:
+        value = float(raw)
+    except ValueError:
+        return 0.60
+    return max(0.0, min(1.0, value))
+
+
+FACE_MATCH_THRESHOLD = _get_match_threshold()
+
 
 def load_image_from_base64(image_b64: str) -> Image.Image:
     """Decode base64 string to a PIL Image."""
@@ -19,6 +38,8 @@ def load_image_from_base64(image_b64: str) -> Image.Image:
     normalized = image_b64.strip()
     if "," in normalized and normalized.lower().startswith("data:"):
         normalized = normalized.split(",", 1)[1]
+    if len(normalized) > _MAX_IMAGE_B64_BYTES:
+        raise ValueError("Image payload exceeds maximum allowed size")
     data = base64.b64decode(normalized)
     return Image.open(io.BytesIO(data)).convert("RGB")
 
@@ -37,21 +58,24 @@ def cosine_similarity(vec1: List[float], vec2: List[float]) -> float:
 def generate_embedding(image_b64: str) -> List[float]:
     """
     Generate a facial embedding using DeepFace.
-    If DeepFace is not available, return a deterministic dummy vector.
+    Raises RuntimeError if DeepFace is not installed.
+    Raises ValueError if no face is detected in the image.
     """
     if DeepFace is None:
-        # Fallback: deterministic pseudo-embedding from image bytes length
-        img = load_image_from_base64(image_b64)
-        size_feature = float(sum(img.size))
-        return [size_feature / 1000.0] * 128
+        raise RuntimeError("DeepFace is not installed; face inference is unavailable")
 
     img = load_image_from_base64(image_b64)
-    embeddings = DeepFace.represent(
-        img_path=np.array(img), model_name="Facenet", enforce_detection=False
-    )
+    try:
+        embeddings = DeepFace.represent(
+            img_path=np.array(img), model_name=FACE_MODEL, enforce_detection=True
+        )
+    except ValueError as exc:
+        # DeepFace raises ValueError when face detection fails
+        raise ValueError("No face detected in the provided image") from exc
+
     if not embeddings:
         return []
-    # DeepFace returns a list of dicts; we take the first embedding
+    # DeepFace returns a list of dicts; take the highest-confidence detection
     rep = embeddings[0]
     return list(rep.get("embedding", []))
 
@@ -61,7 +85,6 @@ def compare_face(stored_embedding: List[float], image_b64: str) -> tuple[bool, f
     if not stored_embedding or not new_embedding:
         return False, 0.0
     sim = cosine_similarity(stored_embedding, new_embedding)
-    # Convert similarity (0-1) to confidence percentage
-    confidence = max(0.0, min(1.0, sim)) * 100.0
-    verified = sim >= 0.7
+    confidence = max(0.0, min(100.0, sim * 100.0))
+    verified = sim >= FACE_MATCH_THRESHOLD
     return verified, confidence

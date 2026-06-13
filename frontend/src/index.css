@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700;800;900&display=swap");
 
 *,
 *::before,
@@ -6,29 +6,62 @@
   box-sizing: border-box;
 }
 
-body {
-  margin: 0;
-  font-family: "Inter", sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* Smooth scrolling */
 html {
   scroll-behavior: smooth;
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
+body {
+  margin: 0;
+  font-family: "Poppins", "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: linear-gradient(160deg, #f0f9ff 0%, #e0f2fe 30%, #ecfeff 65%, #f0fdff 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+  color: #0f172a;
 }
-::-webkit-scrollbar-track {
-  background: #f4f6fb;
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: #f1f5f9; }
+::-webkit-scrollbar-thumb { background: rgba(8,145,178,0.35); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(8,145,178,0.6); }
+
+/* Glow utilities */
+.glow-text {
+  text-shadow: 0 0 20px rgba(8,145,178,0.35), 0 0 40px rgba(8,145,178,0.15);
 }
-::-webkit-scrollbar-thumb {
-  background: rgba(92, 107, 192, 0.4);
-  border-radius: 3px;
+.glow-box {
+  box-shadow: 0 0 24px rgba(8,145,178,0.25), 0 0 48px rgba(8,145,178,0.1);
 }
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(92, 107, 192, 0.7);
+
+/* Josefin Sans headings — let the font breathe */
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Josefin Sans", "Poppins", sans-serif;
+}
+
+/* Glowing chip/badge using MUI primary */
+.MuiChip-colorPrimary {
+  box-shadow: 0 0 10px rgba(8,145,178,0.25);
+}
+
+/* Navbar brand glow */
+.nav-brand-text {
+  text-shadow: 0 0 16px rgba(8,145,178,0.4);
+  font-family: "Josefin Sans", sans-serif;
+  letter-spacing: 0.1em;
+}
+
+/* Glow on focused TextField */
+.MuiOutlinedInput-root.Mui-focused {
+  box-shadow: 0 0 0 3px rgba(8,145,178,0.12);
+}
+
+/* Pulse glow animation for hero card */
+@keyframes cyanPulse {
+  0%   { box-shadow: 0 28px 64px rgba(8,145,178,0.35), 0 0 0 rgba(8,145,178,0); }
+  50%  { box-shadow: 0 28px 64px rgba(8,145,178,0.45), 0 0 40px rgba(8,145,178,0.15); }
+  100% { box-shadow: 0 28px 64px rgba(8,145,178,0.35), 0 0 0 rgba(8,145,178,0); }
+}
+.hero-card-glow {
+  animation: cyanPulse 3s ease-in-out infinite;
 }

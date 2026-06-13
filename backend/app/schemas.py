@@ -64,17 +64,41 @@ class KYCVerifyResponse(BaseModel):
 
 class FaceEnrollRequest(BaseModel):
     student_id: int
-    selfie_image: str  # base64
+    selfie_image: Annotated[str, StringConstraints(max_length=10 * 1024 * 1024)]  # base64
 
 
 class FaceAuthRequest(BaseModel):
     student_id: int
-    live_image: str  # base64
+    live_image: Annotated[str, StringConstraints(max_length=10 * 1024 * 1024)]  # base64
 
 
 class FaceAuthResponse(BaseModel):
     verified: bool
-    confidence_score: float
+    confidence_score: Optional[float] = None
+
+
+class ProfileUpdateRequest(BaseModel):
+    name: Optional[str] = None
+    university: Optional[str] = None
+    student_id_str: Optional[str] = None
+
+
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: Annotated[str, StringConstraints(min_length=8)]
+
+
+class DayStats(BaseModel):
+    date: str
+    attempts: int
+    successes: int
+
+
+class StudentStats(BaseModel):
+    total_attempts: int
+    success_count: int
+    success_rate: float
+    days: List[DayStats]
 
 
 class AuthLogOut(BaseModel):

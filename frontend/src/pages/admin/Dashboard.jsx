@@ -107,7 +107,7 @@ export default function Dashboard() {
             label="Total Students"
             value={stats?.total_students}
             icon={<PeopleIcon />}
-            color="#5C6BC0"
+            color="#22d3ee"
           />
         </Grid>
         <Grid size={{ xs: 6, md: 3 }}>
@@ -123,7 +123,7 @@ export default function Dashboard() {
             label="Face Enrolled"
             value={stats?.face_enrolled}
             icon={<FaceIcon />}
-            color="#7C4DFF"
+            color="#0891b2"
           />
         </Grid>
         <Grid size={{ xs: 6, md: 3 }}>

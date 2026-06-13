@@ -143,8 +143,8 @@ export default function AuthLogs() {
                         label={getActionLabel(log)}
                         size="small"
                         sx={{
-                          bgcolor: "rgba(92,107,192,0.1)",
-                          color: "primary.dark",
+                          bgcolor: "rgba(34,211,238,0.1)",
+                          color: "primary.main",
                           fontWeight: 700,
                           fontSize: "0.7rem",
                         }}

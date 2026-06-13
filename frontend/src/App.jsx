@@ -31,6 +31,7 @@ import StudentIDCard from "./components/StudentIDCard";
 import Timeline from "./components/Timeline";
 import StudentDashboard from "./pages/StudentDashboard";
 import StudentVerificationHistory from "./pages/StudentVerificationHistory";
+import ProfilePage from "./pages/ProfilePage";
 import React from "react";
 import { studentApi } from "./services/api";
 
@@ -81,7 +82,7 @@ function VerificationFlow() {
     );
 
   return (
-    <Box sx={{ bgcolor: "background.default", minHeight: "100vh", pb: 8 }}>
+    <Box sx={{ minHeight: "100vh", pb: 8 }}>
       <Container maxWidth="lg" sx={{ pt: 5 }}>
         {/* Welcome header */}
         <Box sx={{ mb: 4 }}>
@@ -90,8 +91,8 @@ function VerificationFlow() {
             size="small"
             sx={{
               mb: 1.5,
-              bgcolor: "rgba(92,107,192,0.1)",
-              color: "primary.dark",
+              bgcolor: "rgba(34,211,238,0.1)",
+              color: "primary.main",
               fontWeight: 700,
             }}
           />
@@ -212,9 +213,12 @@ export default function App() {
   const { userRole } = useAuth();
 
   return (
-    <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+    <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column", position: "relative" }}>
+      {/* Subtle ambient orbs */}
+      <Box sx={{ position: "fixed", top: "0%", right: "-5%", width: 700, height: 700, borderRadius: "50%", background: "radial-gradient(circle, rgba(8,145,178,0.06) 0%, transparent 65%)", pointerEvents: "none", zIndex: 0 }} />
+      <Box sx={{ position: "fixed", bottom: "5%", left: "-10%", width: 600, height: 600, borderRadius: "50%", background: "radial-gradient(circle, rgba(34,211,238,0.05) 0%, transparent 65%)", pointerEvents: "none", zIndex: 0 }} />
       <Navbar />
-      <Box component="main" sx={{ flex: 1 }}>
+      <Box component="main" sx={{ flex: 1, position: "relative", zIndex: 1 }}>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<SignIn />} />
@@ -252,6 +256,14 @@ export default function App() {
                 ) : (
                   <StudentVerificationHistory />
                 )}
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
               </ProtectedRoute>
             }
           />

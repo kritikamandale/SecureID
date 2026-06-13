@@ -61,15 +61,16 @@ export default function Navbar() {
     px: 1.5,
     py: 0.75,
     borderRadius: 2,
-    bgcolor: pathname === path ? "rgba(92,107,192,0.1)" : "transparent",
+    bgcolor: pathname === path ? "rgba(34,211,238,0.1)" : "transparent",
     textDecoration: "none",
     transition: "all 0.2s",
-    "&:hover": { bgcolor: "rgba(92,107,192,0.08)", color: "primary.main" },
+    "&:hover": { bgcolor: "rgba(34,211,238,0.08)", color: "primary.main" },
   });
 
   const navLinks = [
     { label: "Home", to: "/" },
     ...(isLoggedIn ? [{ label: "Dashboard", to: "/dashboard" }] : []),
+    ...(isLoggedIn && userRole !== "admin" ? [{ label: "Profile", to: "/profile" }] : []),
     ...(isLoggedIn && userRole === "admin" ? [{ label: "Admin", to: "/admin" }] : []),
   ];
 
@@ -86,7 +87,7 @@ export default function Navbar() {
             width: 32,
             height: 32,
             borderRadius: "8px",
-            background: "linear-gradient(135deg, #5C6BC0 0%, #7C4DFF 100%)",
+            background: "linear-gradient(135deg, #22d3ee 0%, #0891b2 100%)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -94,7 +95,7 @@ export default function Navbar() {
         >
           <ShieldIcon sx={{ fontSize: 18, color: "#fff" }} />
         </Box>
-        <Typography variant="h6" fontWeight={800} fontSize="1rem">
+        <Typography variant="h6" fontWeight={700} fontSize="1rem" className="nav-brand-text">
           SECUREID
         </Typography>
       </Box>
@@ -111,7 +112,7 @@ export default function Navbar() {
                 mx: 1,
                 borderRadius: 2,
                 "&.Mui-selected": {
-                  bgcolor: "rgba(92,107,192,0.1)",
+                  bgcolor: "rgba(34,211,238,0.1)",
                   color: "primary.main",
                   fontWeight: 700,
                 },
@@ -187,9 +188,10 @@ export default function Navbar() {
           position="sticky"
           elevation={0}
           sx={{
-            bgcolor: "rgba(255,255,255,0.9)",
-            backdropFilter: "blur(12px)",
-            borderBottom: "1px solid rgba(92,107,192,0.12)",
+            background: "rgba(255,255,255,0.92)",
+            backdropFilter: "blur(20px)",
+            WebkitBackdropFilter: "blur(20px)",
+            borderBottom: "1px solid rgba(8,145,178,0.1)",
             color: "text.primary",
           }}
         >
@@ -216,19 +218,20 @@ export default function Navbar() {
                   width: 36,
                   height: 36,
                   borderRadius: "10px",
-                  background: "linear-gradient(135deg, #5C6BC0 0%, #7C4DFF 100%)",
+                  background: "linear-gradient(135deg, #22d3ee 0%, #0891b2 100%)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  boxShadow: "0 4px 12px rgba(92,107,192,0.4)",
+                  boxShadow: "0 4px 12px rgba(34,211,238,0.35)",
                 }}
               >
                 <ShieldIcon sx={{ fontSize: 20, color: "#fff" }} />
               </Box>
               <Typography
                 variant="h6"
-                fontWeight={800}
-                sx={{ color: "text.primary", letterSpacing: "-0.02em" }}
+                fontWeight={700}
+                className="nav-brand-text"
+                sx={{ color: "text.primary" }}
               >
                 SECUREID
               </Typography>
@@ -295,7 +298,7 @@ export default function Navbar() {
                       height: 34,
                       cursor: "pointer",
                       background:
-                        "linear-gradient(135deg, #5C6BC0 0%, #7C4DFF 100%)",
+                        "linear-gradient(135deg, #22d3ee 0%, #0891b2 100%)",
                       fontSize: "0.8rem",
                       fontWeight: 700,
                     }}
@@ -321,6 +324,14 @@ export default function Navbar() {
                       }}
                     >
                       Dashboard
+                    </MenuItem>
+                    <MenuItem
+                      onClick={() => {
+                        navigate("/profile");
+                        handleMenuClose();
+                      }}
+                    >
+                      Profile &amp; Settings
                     </MenuItem>
                     <MenuItem onClick={handleLogout} sx={{ color: "error.main" }}>
                       Logout

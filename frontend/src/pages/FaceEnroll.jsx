@@ -88,7 +88,7 @@ export default function FaceEnroll({ onComplete }) {
               width: 36,
               height: 36,
               borderRadius: "10px",
-              background: "linear-gradient(135deg, #7C4DFF 0%, #EC407A 100%)",
+              background: "linear-gradient(135deg, #22d3ee 0%, #0891b2 100%)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -135,10 +135,10 @@ export default function FaceEnroll({ onComplete }) {
               flex: "0 0 auto",
               width: 220,
               aspectRatio: "4/3",
-              bgcolor: "#1A1F36",
+              bgcolor: "#0f172a",
               borderRadius: 3,
               overflow: "hidden",
-              border: "2px solid rgba(124,77,255,0.3)",
+              border: "2px solid rgba(34,211,238,0.3)",
             }}
           >
             <video
@@ -171,7 +171,7 @@ export default function FaceEnroll({ onComplete }) {
               }
               sx={{
                 py: 1.2,
-                background: "linear-gradient(135deg, #7C4DFF 0%, #EC407A 100%)",
+                background: "linear-gradient(135deg, #22d3ee 0%, #0891b2 100%)",
               }}
             >
               {loading ? "Enrolling…" : "Capture & Enroll"}

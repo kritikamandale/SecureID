@@ -74,8 +74,7 @@ export default function SignUp() {
     <Box
       sx={{
         minHeight: "100vh",
-        background:
-          "linear-gradient(135deg, #EEF0FB 0%, #F4F6FF 50%, #EAF0FF 100%)",
+        background: "transparent",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -86,7 +85,7 @@ export default function SignUp() {
         sx={{
           width: "100%",
           maxWidth: 650,
-          boxShadow: "0 8px 40px rgba(92,107,192,0.15)",
+          boxShadow: "0 8px 40px rgba(34,211,238,0.15)",
           borderRadius: 3,
         }}
       >
@@ -104,11 +103,11 @@ export default function SignUp() {
                 width: 56,
                 height: 56,
                 borderRadius: "16px",
-                background: "linear-gradient(135deg, #5C6BC0 0%, #7C4DFF 100%)",
+                background: "linear-gradient(135deg, #22d3ee 0%, #0891b2 100%)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                boxShadow: "0 8px 20px rgba(92,107,192,0.4)",
+                boxShadow: "0 8px 20px rgba(34,211,238,0.4)",
                 mb: 2,
               }}
             >
@@ -162,46 +161,38 @@ export default function SignUp() {
               }}
             />
 
-            {role === "student" && (
-              <>
-                <TextField
-                  name="student_id"
-                  label="Student ID"
-                  type="text"
-                  required
-                  fullWidth
-                  value={form.student_id}
-                  onChange={handleChange}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <BadgeIcon
-                          sx={{ fontSize: 18, color: "text.secondary" }}
-                        />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-                <TextField
-                  name="university"
-                  label="University"
-                  type="text"
-                  required
-                  fullWidth
-                  value={form.university}
-                  onChange={handleChange}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <SchoolIcon
-                          sx={{ fontSize: 18, color: "text.secondary" }}
-                        />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </>
-            )}
+            <TextField
+              name="student_id"
+              label="Student ID"
+              type="text"
+              required
+              fullWidth
+              value={form.student_id}
+              onChange={handleChange}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <BadgeIcon sx={{ fontSize: 18, color: "text.secondary" }} />
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <TextField
+              name="university"
+              label="University"
+              type="text"
+              required
+              fullWidth
+              value={form.university}
+              onChange={handleChange}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SchoolIcon sx={{ fontSize: 18, color: "text.secondary" }} />
+                  </InputAdornment>
+                ),
+              }}
+            />
 
             <TextField
               name="email"

@@ -84,8 +84,7 @@ export default function SignIn() {
     <Box
       sx={{
         minHeight: "100vh",
-        background:
-          "linear-gradient(135deg, #EEF0FB 0%, #F4F6FF 50%, #EAF0FF 100%)",
+        background: "transparent",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -96,7 +95,7 @@ export default function SignIn() {
         sx={{
           width: "100%",
           maxWidth: 420,
-          boxShadow: "0 8px 40px rgba(92,107,192,0.15)",
+          boxShadow: "0 8px 40px rgba(34,211,238,0.15)",
         }}
       >
         <CardContent sx={{ p: 4 }}>
@@ -114,11 +113,11 @@ export default function SignIn() {
                 width: 56,
                 height: 56,
                 borderRadius: "16px",
-                background: "linear-gradient(135deg, #5C6BC0 0%, #7C4DFF 100%)",
+                background: "linear-gradient(135deg, #22d3ee 0%, #0891b2 100%)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                boxShadow: "0 8px 20px rgba(92,107,192,0.4)",
+                boxShadow: "0 8px 20px rgba(34,211,238,0.4)",
                 mb: 2,
               }}
             >

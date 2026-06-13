@@ -17,13 +17,13 @@ export default function StudentIDCard({ name, email, studentId, kycStatus }) {
   return (
     <Card
       sx={{
-        background: "linear-gradient(135deg, #5C6BC0 0%, #7C4DFF 100%)",
+        background: "linear-gradient(135deg, #22d3ee 0%, #0891b2 100%)",
         color: "#fff",
         borderRadius: 4,
         overflow: "hidden",
         position: "relative",
         border: "none",
-        boxShadow: "0 8px 32px rgba(92,107,192,0.4)",
+        boxShadow: "0 8px 32px rgba(34,211,238,0.35)",
       }}
     >
       {/* Decorative circles */}

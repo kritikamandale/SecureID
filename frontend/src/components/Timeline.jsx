@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Box, Card, CardContent, Typography, CircularProgress } from "@mui/material";
 import { studentApi } from "../services/api";
 
 export default function Timeline({ timelineData }) {
@@ -11,54 +12,69 @@ export default function Timeline({ timelineData }) {
       setLoading(false);
       return;
     }
-
-    const fetchTimeline = async () => {
-      try {
-        const res = await studentApi.getTimeline();
-        setEvents(res.data);
-      } catch (err) {
-        console.error("Failed to fetch timeline", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    if (!timelineData) fetchTimeline();
+    studentApi
+      .getTimeline()
+      .then((res) => setEvents(res.data))
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, [timelineData]);
 
   if (loading)
     return (
-      <div className="animate-pulse flex space-x-4 p-4">
-        <div className="flex-1 space-y-4 py-1">
-          <div className="h-2 bg-slate-200 rounded"></div>
-          <div className="space-y-3">
-            <div className="grid grid-cols-3 gap-4">
-              <div className="h-2 bg-slate-200 rounded col-span-2"></div>
-              <div className="h-2 bg-slate-200 rounded col-span-1"></div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <Box sx={{ p: 3, display: "flex", justifyContent: "center" }}>
+        <CircularProgress size={24} />
+      </Box>
     );
 
   if (!events.length) return null;
 
   return (
-    <div className="bg-white border border-slate-200 shadow-sm rounded-2xl p-6">
-      <h2 className="text-lg font-bold text-slate-900 mb-4 tracking-tight">
-        Recent Activity
-      </h2>
-      <div className="relative border-l border-slate-200 ml-3 space-y-6">
-        {events.map((ev, i) => (
-          <div key={i} className="pl-6 relative">
-            <div className="absolute w-3 h-3 bg-primary rounded-full -left-[6.5px] top-1.5 ring-4 ring-white" />
-            <h3 className="text-sm font-semibold text-slate-900">{ev.title}</h3>
-            <span className="text-xs font-medium text-slate-500 block mb-1">
-              {new Date(ev.timestamp).toLocaleString()}
-            </span>
-            <p className="text-sm text-slate-600">{ev.detail}</p>
-          </div>
-        ))}
-      </div>
-    </div>
+    <Card>
+      <CardContent sx={{ p: 3 }}>
+        <Typography variant="h6" fontWeight={700} mb={2.5}>
+          Recent Activity
+        </Typography>
+        <Box sx={{ position: "relative", pl: 2.5 }}>
+          {/* Vertical line */}
+          <Box
+            sx={{
+              position: "absolute",
+              left: 7,
+              top: 8,
+              bottom: 8,
+              width: 2,
+              background: "linear-gradient(180deg, #22d3ee, rgba(34,211,238,0.1))",
+              borderRadius: 1,
+            }}
+          />
+          {events.map((ev, i) => (
+            <Box key={i} sx={{ position: "relative", mb: i < events.length - 1 ? 3 : 0 }}>
+              {/* Dot */}
+              <Box
+                sx={{
+                  position: "absolute",
+                  left: -9,
+                  top: 5,
+                  width: 10,
+                  height: 10,
+                  borderRadius: "50%",
+                  background: "linear-gradient(135deg, #22d3ee, #0891b2)",
+                  boxShadow: "0 0 0 3px rgba(34,211,238,0.15)",
+                }}
+              />
+              <Typography variant="body2" fontWeight={700} color="text.primary" lineHeight={1.3}>
+                {ev.title}
+              </Typography>
+              <Typography variant="caption" color="text.disabled" display="block" mb={0.5}>
+                {new Date(ev.timestamp).toLocaleString()}
+              </Typography>
+              <Typography variant="caption" color="text.secondary" lineHeight={1.6}>
+                {ev.detail}
+              </Typography>
+            </Box>
+          ))}
+        </Box>
+      </CardContent>
+    </Card>
   );
 }

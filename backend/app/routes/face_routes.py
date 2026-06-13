@@ -21,13 +21,15 @@ async def call_face_service_generate_embedding(image_b64: str) -> list[float]:
     url = f"{settings.FACE_SERVICE_URL}/generate-embedding"
     async with httpx.AsyncClient(timeout=20.0) as client:
         resp = await client.post(url, json={"image": image_b64})
-        if resp.status_code != 200:
-            raise HTTPException(
-                status_code=status.HTTP_502_BAD_GATEWAY,
-                detail="Face service unavailable",
-            )
-        data = resp.json()
-    return data.get("embedding", [])
+    if resp.status_code == 400:
+        detail = resp.json().get("detail", "Face service rejected the image")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=detail)
+    if resp.status_code != 200:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="Face service unavailable",
+        )
+    return resp.json().get("embedding", [])
 
 
 async def call_face_service_compare(
@@ -39,12 +41,15 @@ async def call_face_service_compare(
             url,
             json={"stored_embedding": stored_embedding, "new_image": image_b64},
         )
-        if resp.status_code != 200:
-            raise HTTPException(
-                status_code=status.HTTP_502_BAD_GATEWAY,
-                detail="Face service unavailable",
-            )
-        return resp.json()
+    if resp.status_code == 400:
+        detail = resp.json().get("detail", "Face service rejected the image")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=detail)
+    if resp.status_code != 200:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="Face service unavailable",
+        )
+    return resp.json()
 
 
 @router.post("/enroll", response_model=schemas.FaceAuthResponse)
@@ -87,8 +92,8 @@ async def enroll_face(
     db.commit()
     db.refresh(student)
 
-    # Enrollment returns a success-style response (verified=true)
-    return schemas.FaceAuthResponse(verified=True, confidence_score=100.0)
+    # Enrollment does not perform a match, so confidence is intentionally omitted.
+    return schemas.FaceAuthResponse(verified=True, confidence_score=None)
 
 
 @router.post("/authenticate", response_model=schemas.FaceAuthResponse)

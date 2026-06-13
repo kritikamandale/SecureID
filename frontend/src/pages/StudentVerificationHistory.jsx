@@ -57,7 +57,6 @@ export default function StudentVerificationHistory() {
     <Box
       sx={{
         p: 4,
-        bgcolor: "background.default",
         minHeight: "100vh",
       }}
     >

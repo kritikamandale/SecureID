@@ -18,6 +18,7 @@ api.interceptors.request.use((config) => {
 export const authApi = {
   register: (payload) => api.post("/auth/register", payload),
   login: (payload) => api.post("/auth/login", payload),
+  changePassword: (payload) => api.post("/auth/change-password", payload),
 };
 
 export const kycApi = {
@@ -37,7 +38,10 @@ export const adminApi = {
 };
 
 export const studentApi = {
+  getMe: () => api.get("/student/me"),
   getTimeline: () => api.get("/student/timeline"),
+  getStats: () => api.get("/student/stats"),
+  updateProfile: (payload) => api.patch("/student/profile", payload),
   getVerificationHistory: (studentId) =>
     api.get(`/verification/history/${studentId}`),
 };

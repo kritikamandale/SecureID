@@ -93,14 +93,15 @@ function BlockchainExplorer() {
                 border: "1px solid",
                 borderColor: "divider",
                 borderRadius: 2,
-                bgcolor: "#1e1e2d",
-                color: "#fff",
+                bgcolor: "#f8fafc",
+                color: "text.primary",
+                border: "1px solid rgba(8,145,178,0.12)",
               }}
             >
               <Typography
                 variant="subtitle1"
                 fontWeight={700}
-                sx={{ color: "#90caf9", mb: 0.5 }}
+                sx={{ color: "primary.main", mb: 0.5 }}
               >
                 {s.name}
               </Typography>
@@ -119,7 +120,7 @@ function BlockchainExplorer() {
                 <Chip
                   size="small"
                   label="Face Enrolled"
-                  sx={{ bgcolor: "rgba(124,77,255,0.2)", color: "#B47CFF", fontSize: "0.65rem" }}
+                  sx={{ bgcolor: "rgba(34,211,238,0.15)", color: "#22d3ee", fontSize: "0.65rem" }}
                 />
               </Box>
             </Box>
@@ -138,7 +139,7 @@ export default function AdminPortal() {
   };
 
   return (
-    <Box sx={{ bgcolor: "background.default", minHeight: "100vh", pb: 8 }}>
+    <Box sx={{ minHeight: "100vh", pb: 8 }}>
       <Container maxWidth="xl" sx={{ pt: 5 }}>
         <Box
           sx={{
@@ -155,7 +156,7 @@ export default function AdminPortal() {
               sx={{
                 mb: 1.5,
                 bgcolor: "rgba(255,112,67,0.1)",
-                color: "#BF360C",
+                color: "#22d3ee",
                 fontWeight: 700,
               }}
             />

@@ -3,5 +3,5 @@ uvicorn[standard]==0.30.6
 numpy>=2.0.0,<3.0.0
 Pillow>=10.4.0,<13.0.0
 # DeepFace can be heavy and is not yet broadly compatible on latest Python.
-# The service gracefully falls back to deterministic embeddings when absent.
+# The service requires DeepFace for real inference and returns an error if absent.
 deepface==0.0.93; python_version < "3.13"

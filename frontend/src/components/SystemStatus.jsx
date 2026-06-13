@@ -86,9 +86,9 @@ export default function SystemStatus({ compact = false }) {
   return (
     <Box
       sx={{
-        bgcolor: "rgba(255,255,255,0.7)",
+        bgcolor: "rgba(8,145,178,0.04)",
         backdropFilter: "blur(12px)",
-        border: "1px solid rgba(92,107,192,0.15)",
+        border: "1px solid rgba(34,211,238,0.15)",
         borderRadius: 3,
         p: 3,
         maxWidth: 480,

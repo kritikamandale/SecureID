@@ -82,7 +82,7 @@ export default function KYCUpload({ onComplete }) {
               width: 36,
               height: 36,
               borderRadius: "10px",
-              background: "linear-gradient(135deg, #00BCD4 0%, #5C6BC0 100%)",
+              background: "linear-gradient(135deg, #22d3ee 0%, #0891b2 100%)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
