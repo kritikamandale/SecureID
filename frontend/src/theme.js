@@ -40,43 +40,43 @@ const theme = createTheme({
   },
 
   typography: {
-    fontFamily: '"Poppins", "Segoe UI", "Roboto", sans-serif',
+    fontFamily: '"DM Sans", "Segoe UI", "Roboto", sans-serif',
     h1: {
-      fontFamily: '"Josefin Sans", "Poppins", sans-serif',
+      fontFamily: '"Outfit", "DM Sans", sans-serif',
       fontWeight: 700,
       letterSpacing: "-0.01em",
       textShadow: "0 0 40px rgba(8,145,178,0.18), 0 0 80px rgba(8,145,178,0.08)",
     },
     h2: {
-      fontFamily: '"Josefin Sans", "Poppins", sans-serif',
+      fontFamily: '"Outfit", "DM Sans", sans-serif',
       fontWeight: 700,
       letterSpacing: "-0.01em",
       textShadow: "0 0 32px rgba(8,145,178,0.15), 0 0 64px rgba(8,145,178,0.07)",
     },
     h3: {
-      fontFamily: '"Josefin Sans", "Poppins", sans-serif',
+      fontFamily: '"Outfit", "DM Sans", sans-serif',
       fontWeight: 700,
       letterSpacing: "0em",
       textShadow: "0 0 24px rgba(8,145,178,0.12)",
     },
     h4: {
-      fontFamily: '"Josefin Sans", "Poppins", sans-serif',
+      fontFamily: '"Outfit", "DM Sans", sans-serif',
       fontWeight: 700,
       letterSpacing: "0.01em",
     },
     h5: {
-      fontFamily: '"Josefin Sans", "Poppins", sans-serif',
+      fontFamily: '"Outfit", "DM Sans", sans-serif',
       fontWeight: 600,
       letterSpacing: "0.01em",
     },
     h6: {
-      fontFamily: '"Josefin Sans", "Poppins", sans-serif',
+      fontFamily: '"Outfit", "DM Sans", sans-serif',
       fontWeight: 600,
       letterSpacing: "0.02em",
     },
     button: { fontWeight: 700, textTransform: "none", letterSpacing: "0.03em" },
     overline: {
-      fontFamily: '"Josefin Sans", "Poppins", sans-serif',
+      fontFamily: '"Outfit", "DM Sans", sans-serif',
       letterSpacing: "0.18em",
       fontWeight: 600,
     },

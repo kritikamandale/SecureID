@@ -7,4 +7,26 @@ logs/
 *.log
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
 backend/secureid.db
+
+# local env overrides (Vite convention)
+*.local
+
+# Python virtual environments
+.venv/
+venv/
+env/
+
+# pytest / coverage
+.pytest_cache/
+htmlcov/
+*.egg-info/
+
+# Vite dependency cache
+.vite/
+
+# Hardhat compile cache and build artifacts
+blockchain/cache/
+blockchain/artifacts/

@@ -1,0 +1,19 @@
+{
+  "name": "secureid",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "blockchain"
+  ],
+  "scripts": {
+    "dev:frontend": "npm run dev --workspace=frontend",
+    "build:frontend": "npm run build --workspace=frontend",
+    "preview:frontend": "npm run preview --workspace=frontend",
+    "blockchain:node": "npm exec --workspace=blockchain -- hardhat node",
+    "blockchain:deploy": "npm exec --workspace=blockchain -- hardhat run scripts/deploy.js --network localhost"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

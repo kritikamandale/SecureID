@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700;800;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Outfit:wght@400;500;600;700;800&display=swap");
 
 *,
 *::before,
@@ -12,7 +12,7 @@ html {
 
 body {
   margin: 0;
-  font-family: "Poppins", "Segoe UI", sans-serif;
+  font-family: "DM Sans", "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background: linear-gradient(160deg, #f0f9ff 0%, #e0f2fe 30%, #ecfeff 65%, #f0fdff 100%);
@@ -34,9 +34,9 @@ body {
   box-shadow: 0 0 24px rgba(8,145,178,0.25), 0 0 48px rgba(8,145,178,0.1);
 }
 
-/* Josefin Sans headings — let the font breathe */
+/* Outfit headings — let the font breathe */
 h1, h2, h3, h4, h5, h6 {
-  font-family: "Josefin Sans", "Poppins", sans-serif;
+  font-family: "Outfit", "DM Sans", sans-serif;
 }
 
 /* Glowing chip/badge using MUI primary */
@@ -47,7 +47,7 @@ h1, h2, h3, h4, h5, h6 {
 /* Navbar brand glow */
 .nav-brand-text {
   text-shadow: 0 0 16px rgba(8,145,178,0.4);
-  font-family: "Josefin Sans", sans-serif;
+  font-family: "Outfit", sans-serif;
   letter-spacing: 0.1em;
 }
 
