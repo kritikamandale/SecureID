@@ -23,6 +23,8 @@ async function main() {
     __dirname,
     "..",
     "..",
+    "..",
+    "apps",
     "backend",
     "app",
     "blockchain_data",

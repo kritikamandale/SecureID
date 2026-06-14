@@ -8,13 +8,20 @@ SECUREID is a full-stack platform for **secure university student identity verif
 
 ## Project Structure
 
+This is a **Turborepo monorepo** managed with pnpm workspaces.
+
 ```
 SecureID/
-├── backend/          # FastAPI REST API (Python)
-├── face-service/     # DeepFace microservice (Python)
-├── frontend/         # React 18 + MUI SPA
-├── blockchain/       # Hardhat + Solidity smart contract
-└── devops/           # Docker Compose for local orchestration
+├── apps/
+│   ├── frontend/         # React 18 + Vite + MUI SPA
+│   ├── backend/          # FastAPI REST API (Python)
+│   └── face-service/     # DeepFace microservice (Python)
+├── packages/
+│   ├── blockchain/       # Hardhat + Solidity smart contract
+│   └── config/           # Shared configuration stubs
+├── package.json          # Root workspace — pnpm + turbo scripts
+├── pnpm-workspace.yaml   # pnpm workspace definition
+└── turbo.json            # Turborepo task pipeline
 ```
 
 ---
@@ -116,58 +123,77 @@ VITE_FACE_SERVICE_URL=http://localhost:8001
 
 ---
 
-## Blockchain (`blockchain/`)
+## Blockchain (`packages/blockchain/`)
 
 Hardhat project with `StudentVerificationLedger.sol` — a Solidity contract that records a SHA-256 hash of each verification event (student ID + document hash + face score) on a local chain.
 
 The backend calls the contract after each successful `POST /face/authenticate`.
 
 ```bash
-cd blockchain
-npm install
-npx hardhat node          # start local chain on :8545
+# From repo root (recommended)
+pnpm blockchain:node      # start local Hardhat chain on :8545
+pnpm blockchain:deploy    # deploy contract; writes ABI to apps/backend/app/blockchain_data/
+
+# Or manually
+cd packages/blockchain
+npx hardhat node
 npx hardhat run scripts/deploy.js --network localhost
 ```
 
-The deployed contract address and ABI are saved to `backend/app/blockchain_data/contract_info.json`.
+The deployed contract address and ABI are saved to `apps/backend/app/blockchain_data/contract_info.json`.
 
 ---
 
 ## Running Locally (without Docker)
 
-### 1. Backend
+### Install all dependencies
 
 ```bash
-cd backend
+# From repo root — installs JS/TS deps for all workspaces
+pnpm install
+```
+
+### Run all services in parallel (Turborepo)
+
+```bash
+pnpm dev           # starts frontend + backend + face-service concurrently
+```
+
+Or start individual services:
+
+```bash
+pnpm dev:frontend       # React + Vite on :5173
+pnpm dev:backend        # FastAPI on :8000
+pnpm dev:face-service   # Face microservice on :8001
+```
+
+### Manual (per-service)
+
+**Backend**
+```bash
+cd apps/backend
 python -m venv .venv
 # Windows: .venv\Scripts\activate  |  macOS/Linux: source .venv/bin/activate
 pip install -r requirements.txt
-
-# Copy and edit environment variables
-copy .env.example .env
-
-# Start (SQLite used by default in .env.example)
+copy .env.example .env   # edit as needed
 uvicorn app.main:app --reload --port 8000
 ```
 
 API docs: `http://localhost:8000/docs`
 
-### 2. Face Microservice
-
+**Face Microservice**
 ```bash
-cd face-service
+cd apps/face-service
 python -m venv .venv
 pip install -r requirements.txt
 uvicorn app:app --reload --port 8001
 ```
 
-### 3. Frontend
-
+**Frontend**
 ```bash
-cd frontend
-npm install
+cd apps/frontend
 cp .env.example .env.local   # edit if ports differ
-npm run dev
+pnpm dev
 ```
 
 App: `http://localhost:5173`
@@ -191,7 +217,7 @@ docker compose up --build
 
 ## Environment Variables Reference
 
-### Backend (`backend/.env`)
+### Backend (`apps/backend/.env`)
 
 | Variable | Default | Description |
 |----------|---------|-------------|
@@ -202,7 +228,7 @@ docker compose up --build
 | `FACE_SERVICE_URL` | `http://localhost:8001` | Face microservice URL |
 | `BLOCKCHAIN_RPC_URL` | `http://127.0.0.1:8545` | Hardhat / EVM-compatible node |
 
-### Frontend (`frontend/.env.local`)
+### Frontend (`apps/frontend/.env.local`)
 
 | Variable | Default | Description |
 |----------|---------|-------------|
@@ -223,14 +249,20 @@ docker compose up --build
 
 ---
 
-## Tests
+## Build & Tests
 
 ```bash
-# Backend
-cd backend
-pytest tests/
+# Run all builds via Turborepo (frontend only — Python services have no build step)
+pnpm build
 
-# Face service
-cd face-service
-pytest tests/
+# Run all tests
+pnpm test
+
+# Per-package filter
+pnpm turbo run test --filter=@secureid/face-service
+pnpm turbo run test --filter=@secureid/backend
+
+# Manual per-service
+cd apps/backend && python -m pytest tests/ -v
+cd apps/face-service && python -m pytest tests/ -v
 ```

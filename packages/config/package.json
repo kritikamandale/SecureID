@@ -1,0 +1,9 @@
+{
+  "name": "@secureid/config",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "lint": "echo \"No shared config lint\"",
+    "test": "echo \"No shared config tests\""
+  }
+}

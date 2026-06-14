@@ -9,7 +9,9 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
-backend/secureid.db
+
+# database files
+*.db
 
 # local env overrides (Vite convention)
 *.local
@@ -28,5 +30,8 @@ htmlcov/
 .vite/
 
 # Hardhat compile cache and build artifacts
-blockchain/cache/
-blockchain/artifacts/
+**/blockchain/cache/
+**/blockchain/artifacts/
+
+# Turborepo
+.turbo/

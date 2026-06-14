@@ -1,11 +1,11 @@
 {
-  "name": "secureid-frontend",
+  "name": "@secureid/frontend",
   "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "node scripts/build.mjs",
     "preview": "vite preview",
     "lint": "echo \"no lint configured\"",
     "test": "echo \"no tests configured\""

@@ -2,17 +2,21 @@
   "name": "secureid",
   "version": "1.0.0",
   "private": true,
-  "workspaces": [
-    "frontend",
-    "blockchain"
-  ],
   "scripts": {
-    "dev:frontend": "npm run dev --workspace=frontend",
-    "build:frontend": "npm run build --workspace=frontend",
-    "preview:frontend": "npm run preview --workspace=frontend",
-    "blockchain:node": "npm exec --workspace=blockchain -- hardhat node",
-    "blockchain:deploy": "npm exec --workspace=blockchain -- hardhat run scripts/deploy.js --network localhost"
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "dev:frontend": "turbo run dev --filter=@secureid/frontend",
+    "dev:backend": "turbo run dev --filter=@secureid/backend",
+    "dev:face-service": "turbo run dev --filter=@secureid/face-service",
+    "blockchain:node": "turbo run node --filter=@secureid/blockchain",
+    "blockchain:deploy": "turbo run deploy --filter=@secureid/blockchain"
   },
+  "devDependencies": {
+    "turbo": "^2.0.0"
+  },
+  "packageManager": "pnpm@9.15.4",
   "engines": {
     "node": ">=18"
   }
