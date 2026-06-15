@@ -59,8 +59,9 @@ def generate_embedding_endpoint(payload: GenerateEmbeddingRequest):
         embedding = generate_embedding(payload.image)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
-    except Exception:
-        raise HTTPException(status_code=400, detail="Failed to process image")
+    except Exception as exc:
+        import traceback; traceback.print_exc()
+        raise HTTPException(status_code=400, detail=f"Failed to process image: {exc}")
     if not embedding:
         raise HTTPException(status_code=400, detail="No face detected or embedding empty")
     return GenerateEmbeddingResponse(embedding=embedding)

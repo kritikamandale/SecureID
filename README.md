@@ -32,7 +32,7 @@ SecureID/
 |-------|-----------|
 | Frontend | React 18, Vite, Material UI v7, React Router v6 |
 | Backend | FastAPI, SQLAlchemy, Pydantic v2, python-jose, passlib/bcrypt |
-| Face AI | DeepFace microservice (cosine similarity, graceful fallback) |
+| Face AI | DeepFace microservice (cosine similarity, graceful pixel fallback) |
 | Database | SQLite (local dev) / PostgreSQL (Docker / production) |
 | Auth | JWT Bearer tokens |
 | Blockchain | Hardhat + Solidity (local node), Web3.py |
@@ -41,7 +41,7 @@ SecureID/
 
 ---
 
-## Backend (`backend/app`)
+## Backend (`apps/backend/`)
 
 ### Routes
 
@@ -65,7 +65,7 @@ SecureID/
 ### Key Files
 
 - `main.py` — App setup, CORS (reads `settings.BACKEND_CORS_ORIGINS`), lifespan
-- `config.py` — All settings via env vars with defaults; warns on weak JWT secret at startup
+- `config.py` — All settings via pydantic-settings, auto-loads `apps/backend/.env`; warns on weak JWT secret at startup
 - `models.py` — `Student`, `FaceEmbedding`, `AuthenticationLog` (with event timestamps)
 - `auth.py` — Registration (blocks admin role), login, JWT guard dependency
 - `utils.py` — bcrypt hashing, JWT generation
@@ -73,6 +73,7 @@ SecureID/
 - `blockchain_service.py` — Connects to local Hardhat node (configurable via `BLOCKCHAIN_RPC_URL`)
 
 ### Security
+
 - Passwords hashed with bcrypt via `passlib`
 - JWT Bearer tokens (HS256), expiry configurable
 - Admin routes protected by `require_admin` dependency (JWT + role check)
@@ -82,17 +83,17 @@ SecureID/
 
 ---
 
-## AI Face Microservice (`face-service/`)
+## AI Face Microservice (`apps/face-service/`)
 
 - `POST /generate-embedding` — Returns face embedding vector for a base64 image
 - `POST /compare-face` — Cosine similarity vs stored embedding → `verified` + confidence score
 - `GET /health` — Health check
 
-Uses DeepFace when available; falls back to a deterministic embedding for environments without GPU/model files.
+Uses DeepFace when available. Falls back to a deterministic pixel-based descriptor (controlled by `FACE_FALLBACK=true`) for environments without GPU or model files — enrollment and re-authentication of the same person still work consistently under this mode.
 
 ---
 
-## Frontend (`frontend/`)
+## Frontend (`apps/frontend/`)
 
 ### Pages & Routes
 
@@ -114,10 +115,10 @@ Uses DeepFace when available; falls back to a deterministic embedding for enviro
 - `SystemStatus` — Live health check for backend and face service
 - `Timeline` — Chronological verification event list
 
-### Environment Variables (copy `frontend/.env.example` → `.env.local`)
+### Environment Variables (`apps/frontend/.env.local`)
 
 ```env
-VITE_API_BASE_URL=http://localhost:8000
+VITE_API_BASE_URL=http://localhost:8002
 VITE_FACE_SERVICE_URL=http://localhost:8001
 ```
 
@@ -163,7 +164,7 @@ Or start individual services:
 
 ```bash
 pnpm dev:frontend       # React + Vite on :5173
-pnpm dev:backend        # FastAPI on :8000
+pnpm dev:backend        # FastAPI on :8002
 pnpm dev:face-service   # Face microservice on :8001
 ```
 
@@ -175,11 +176,11 @@ cd apps/backend
 python -m venv .venv
 # Windows: .venv\Scripts\activate  |  macOS/Linux: source .venv/bin/activate
 pip install -r requirements.txt
-copy .env.example .env   # edit as needed
-uvicorn app.main:app --reload --port 8000
+# A pre-configured .env is included (SQLite by default)
+uvicorn app.main:app --reload --port 8002
 ```
 
-API docs: `http://localhost:8000/docs`
+API docs: `http://localhost:8002/docs`
 
 **Face Microservice**
 ```bash
@@ -192,7 +193,7 @@ uvicorn app:app --reload --port 8001
 **Frontend**
 ```bash
 cd apps/frontend
-cp .env.example .env.local   # edit if ports differ
+# .env.local already points to :8002 and :8001
 pnpm dev
 ```
 
@@ -210,7 +211,7 @@ docker compose up --build
 | Service | URL |
 |---------|-----|
 | Frontend | http://localhost:5173 |
-| Backend API | http://localhost:8000/docs |
+| Backend API | http://localhost:8002/docs |
 | Face Service | http://localhost:8001/docs |
 
 ---
@@ -222,24 +223,32 @@ docker compose up --build
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `ENV` | `development` | Set to `production` to enforce strong JWT secret |
-| `DATABASE_URL` | SQLite | PostgreSQL or SQLite connection string |
+| `DATABASE_URL` | `sqlite:///./secureid.db` | PostgreSQL or SQLite connection string |
 | `JWT_SECRET_KEY` | `CHANGE_ME_SUPER_SECRET` | **Must be changed in production** |
 | `FRONTEND_ORIGIN` | `http://localhost:5173` | Allowed CORS origin |
 | `FACE_SERVICE_URL` | `http://localhost:8001` | Face microservice URL |
 | `BLOCKCHAIN_RPC_URL` | `http://127.0.0.1:8545` | Hardhat / EVM-compatible node |
 
+### Face Service
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `FACE_FALLBACK` | `true` | Use pixel-based fallback when DeepFace is unavailable |
+| `FACE_MODEL` | `Facenet` | DeepFace model name (ignored when fallback is active) |
+| `FACE_MATCH_THRESHOLD` | `0.60` | Cosine similarity threshold for a positive match |
+
 ### Frontend (`apps/frontend/.env.local`)
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `VITE_API_BASE_URL` | `http://localhost:8000` | Backend API base URL |
+| `VITE_API_BASE_URL` | `http://localhost:8002` | Backend API base URL |
 | `VITE_FACE_SERVICE_URL` | `http://localhost:8001` | Face service URL (health check) |
 
 ---
 
 ## Demo Flow
 
-1. **Register** — Go to `/register`, create a student account (30 seconds)
+1. **Register** — Go to `/register`, create a student account
 2. **Login** — Sign in at `/login`; redirected to `/verify` if KYC/face are incomplete
 3. **KYC** — Enter a 12-digit Aadhaar (e.g. `123456789012`) and upload any image as ID card → status becomes `verified`
 4. **Face Enroll** — Allow webcam, centre your face, click **Capture & Enroll**
