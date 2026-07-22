@@ -215,8 +215,8 @@ export default function App() {
   return (
     <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column", position: "relative" }}>
       {/* Subtle ambient orbs */}
-      <Box sx={{ position: "fixed", top: "0%", right: "-5%", width: 700, height: 700, borderRadius: "50%", background: "radial-gradient(circle, rgba(8,145,178,0.06) 0%, transparent 65%)", pointerEvents: "none", zIndex: 0 }} />
-      <Box sx={{ position: "fixed", bottom: "5%", left: "-10%", width: 600, height: 600, borderRadius: "50%", background: "radial-gradient(circle, rgba(34,211,238,0.05) 0%, transparent 65%)", pointerEvents: "none", zIndex: 0 }} />
+      <Box sx={{ position: "fixed", top: "0%", right: "-5%", width: 700, height: 700, borderRadius: "50%", background: "radial-gradient(circle, rgba(0,217,192,0.07) 0%, transparent 65%)", pointerEvents: "none", zIndex: 0 }} />
+      <Box sx={{ position: "fixed", bottom: "5%", left: "-10%", width: 600, height: 600, borderRadius: "50%", background: "radial-gradient(circle, rgba(0,217,192,0.05) 0%, transparent 65%)", pointerEvents: "none", zIndex: 0 }} />
       <Navbar />
       <Box component="main" sx={{ flex: 1, position: "relative", zIndex: 1 }}>
         <Routes>

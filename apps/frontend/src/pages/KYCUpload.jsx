@@ -82,13 +82,13 @@ export default function KYCUpload({ onComplete }) {
               width: 36,
               height: 36,
               borderRadius: "10px",
-              background: "linear-gradient(135deg, #22d3ee 0%, #0891b2 100%)",
+              background: "linear-gradient(135deg, #00D9C0 0%, #00a592 100%)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
           >
-            <BadgeIcon sx={{ fontSize: 18, color: "#fff" }} />
+            <BadgeIcon sx={{ fontSize: 18, color: "#0B1220" }} />
           </Box>
           <Box>
             <Typography variant="h6" fontWeight={700}>

@@ -1,4 +1,20 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Outfit:wght@400;500;600;700;800&display=swap");
+/* ── SecureID Typography Fonts ────────────────────────────────────── */
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Outfit:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
+
+/* ─────────────────────────────────────────────────────────────────
+   Design Tokens & Root Setup
+   ───────────────────────────────────────────────────────────────── */
+:root {
+  --ink-navy:        #0B1220;
+  --ink-navy-raised: #121C2E;
+  --verify-cyan:     #00D9C0;
+  --alert-amber:     #F5A623;
+  --text-primary:    #EDF2F7;
+  --text-secondary:  #8B98AC; /* 5.2:1 contrast on --ink-navy — WCAG AA ✓ */
+  --border-hairline: rgba(237, 242, 247, 0.08);
+  --font-display:    "Space Grotesk", "Outfit", "DM Sans", sans-serif;
+  --font-mono:       "JetBrains Mono", "Consolas", monospace;
+}
 
 *,
 *::before,
@@ -8,6 +24,7 @@
 
 html {
   scroll-behavior: smooth;
+  background-color: var(--ink-navy);
 }
 
 body {
@@ -15,53 +32,384 @@ body {
   font-family: "DM Sans", "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(160deg, #f0f9ff 0%, #e0f2fe 30%, #ecfeff 65%, #f0fdff 100%);
-  background-attachment: fixed;
+  background-color: var(--ink-navy);
   min-height: 100vh;
-  color: #0f172a;
+  color: var(--text-primary);
 }
 
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: #f1f5f9; }
-::-webkit-scrollbar-thumb { background: rgba(8,145,178,0.35); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(8,145,178,0.6); }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0B1220; }
+::-webkit-scrollbar-thumb { background: rgba(0, 217, 192, 0.25); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0, 217, 192, 0.5); }
 
 /* Glow utilities */
 .glow-text {
-  text-shadow: 0 0 20px rgba(8,145,178,0.35), 0 0 40px rgba(8,145,178,0.15);
+  text-shadow: 0 0 20px rgba(0, 217, 192, 0.4), 0 0 40px rgba(0, 217, 192, 0.2);
 }
 .glow-box {
-  box-shadow: 0 0 24px rgba(8,145,178,0.25), 0 0 48px rgba(8,145,178,0.1);
+  box-shadow: 0 0 24px rgba(0, 217, 192, 0.25), 0 0 48px rgba(0, 217, 192, 0.1);
 }
 
-/* Outfit headings — let the font breathe */
+/* Headings default to Space Grotesk */
 h1, h2, h3, h4, h5, h6 {
-  font-family: "Outfit", "DM Sans", sans-serif;
+  font-family: var(--font-display);
 }
 
-/* Glowing chip/badge using MUI primary */
-.MuiChip-colorPrimary {
-  box-shadow: 0 0 10px rgba(8,145,178,0.25);
+/* Global utility classes */
+.sid-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.03em;
+  line-height: 1.08;
 }
 
-/* Navbar brand glow */
+.sid-mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+}
+
+/* Navbar brand text */
 .nav-brand-text {
-  text-shadow: 0 0 16px rgba(8,145,178,0.4);
-  font-family: "Outfit", sans-serif;
+  text-shadow: 0 0 16px rgba(0, 217, 192, 0.4);
+  font-family: var(--font-display);
+  letter-spacing: 0.08em;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   Nav Links — Plain text with hover underline (NO pill background)
+   ───────────────────────────────────────────────────────────────── */
+.sid-nav-link {
+  position: relative;
+  color: var(--text-secondary);
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 0.9rem;
+  text-decoration: none;
+  padding: 6px 12px;
+  transition: color 0.2s ease;
+}
+
+.sid-nav-link::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 12px;
+  right: 12px;
+  height: 2px;
+  background-color: var(--verify-cyan);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.25s ease;
+}
+
+.sid-nav-link:hover,
+.sid-nav-link.active {
+  color: var(--text-primary);
+}
+
+.sid-nav-link:hover::after,
+.sid-nav-link.active::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   Bracket-Cut Button — Square corners with diagonal corner cutout
+   ───────────────────────────────────────────────────────────────── */
+.sid-btn-bracket {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: #0B1220;
+  background-color: var(--verify-cyan);
+  border: none;
+  /* Cutout top-right corner */
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0, 217, 192, 0.3);
+  transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+}
+
+.sid-btn-bracket:hover {
+  background-color: #4DFFE9;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 217, 192, 0.5);
+}
+
+.sid-btn-bracket-outlined {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  background-color: transparent;
+  border: 1px solid var(--border-hairline);
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.2s, border-color 0.2s, background-color 0.2s;
+}
+
+.sid-btn-bracket-outlined:hover {
+  border-color: rgba(0, 217, 192, 0.4);
+  background-color: rgba(0, 217, 192, 0.08);
+  color: var(--verify-cyan);
+  transform: translateY(-2px);
+}
+
+.sid-btn-bracket:focus-visible,
+.sid-btn-bracket-outlined:focus-visible {
+  outline: 2px solid var(--verify-cyan);
+  outline-offset: 3px;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   Terminal / Readout Status Line
+   ───────────────────────────────────────────────────────────────── */
+.sid-terminal-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--verify-cyan);
+  letter-spacing: 0.08em;
+  margin-bottom: 24px;
+  background: rgba(0, 217, 192, 0.06);
+  border-left: 3px solid var(--verify-cyan);
+  padding: 6px 14px 6px 12px;
+}
+
+@keyframes sid-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.3; transform: scale(0.85); }
+}
+
+.sid-pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--verify-cyan);
+  box-shadow: 0 0 10px var(--verify-cyan);
+  animation: sid-pulse 1.8s ease-in-out infinite;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   Open Corner-Bracket Viewfinder Frame
+   (NO dashed border, NO rounded corners, 4 L-brackets only)
+   ───────────────────────────────────────────────────────────────── */
+.sid-viewfinder-frame {
+  position: relative;
+  width: 100%;
+  background: rgba(18, 28, 46, 0.6);
+  backdrop-filter: blur(12px);
+  overflow: hidden;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+}
+
+/* Four Corner Brackets */
+.sid-bracket {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-color: var(--verify-cyan);
+  border-style: solid;
+  pointer-events: none;
+  z-index: 12;
+}
+
+.sid-bracket-tl { top: 0; left: 0; border-width: 2px 0 0 2px; }
+.sid-bracket-tr { top: 0; right: 0; border-width: 2px 2px 0 0; }
+.sid-bracket-bl { bottom: 0; left: 0; border-width: 0 0 2px 2px; }
+.sid-bracket-br { bottom: 0; right: 0; border-width: 0 2px 2px 0; }
+
+/* Viewfinder HUD crosshairs */
+.sid-viewfinder-hud {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 8;
+  opacity: 0.3;
+}
+
+/* Scan Bar Animation inside open viewfinder */
+@keyframes sid-scan-sweep {
+  0%   { top: -4px; opacity: 0; }
+  5%   { opacity: 1; }
+  90%  { opacity: 0.9; }
+  100% { top: 100%; opacity: 0; }
+}
+
+@keyframes sid-scan-glow {
+  0%, 100% { box-shadow: 0 0 8px 2px rgba(0, 217, 192, 0.4); }
+  50%       { box-shadow: 0 0 18px 5px rgba(0, 217, 192, 0.75); }
+}
+
+.sid-viewfinder-frame .sid-scan-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent 0%, var(--verify-cyan) 20%, rgba(0, 217, 192, 0.9) 50%, var(--verify-cyan) 80%, transparent 100%);
+  animation: sid-scan-sweep 3.2s cubic-bezier(0.4, 0, 0.2, 1) infinite,
+             sid-scan-glow  3.2s ease-in-out infinite;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   Vertical Monospace Ticker Readout (Stats)
+   ───────────────────────────────────────────────────────────────── */
+.sid-mono-ticker {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px 20px;
+  background: rgba(18, 28, 46, 0.8);
+  border-left: 2px solid var(--verify-cyan);
+  backdrop-filter: blur(12px);
+}
+
+.sid-ticker-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.sid-ticker-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-secondary);
   letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
-/* Glow on focused TextField */
-.MuiOutlinedInput-root.Mui-focused {
-  box-shadow: 0 0 0 3px rgba(8,145,178,0.12);
+.sid-ticker-value {
+  font-family: var(--font-mono);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--verify-cyan);
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
 }
 
-/* Pulse glow animation for hero card */
-@keyframes cyanPulse {
-  0%   { box-shadow: 0 28px 64px rgba(8,145,178,0.35), 0 0 0 rgba(8,145,178,0); }
-  50%  { box-shadow: 0 28px 64px rgba(8,145,178,0.45), 0 0 40px rgba(8,145,178,0.15); }
-  100% { box-shadow: 0 28px 64px rgba(8,145,178,0.35), 0 0 0 rgba(8,145,178,0); }
+/* ─────────────────────────────────────────────────────────────────
+   Asymmetric Hero Grid
+   ───────────────────────────────────────────────────────────────── */
+.sid-hero-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  align-items: center;
+  gap: 32px;
+  position: relative;
 }
-.hero-card-glow {
-  animation: cyanPulse 3s ease-in-out infinite;
+
+.sid-hero-visual-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (min-width: 901px) {
+  .sid-hero-visual-wrapper {
+    margin-left: -40px; /* Controlled overlap into left column */
+    z-index: 2;
+  }
+}
+
+@media (max-width: 900px) {
+  .sid-hero-grid {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+  .sid-hero-visual-wrapper {
+    margin-left: 0;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   Scan Divider & Step/Use-case Cards with Corner Brackets
+   ───────────────────────────────────────────────────────────────── */
+.sid-scan-divider {
+  position: relative;
+  width: 100%;
+  height: 1px;
+  background: var(--border-hairline);
+  overflow: hidden;
+  margin: 0;
+}
+
+@keyframes sid-scan-h {
+  0%   { left: -100%; opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 0.85; }
+  100% { left: 100%; opacity: 0; }
+}
+
+.sid-scan-divider::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent 0%, var(--verify-cyan) 40%, rgba(0, 217, 192, 0.6) 60%, transparent 100%);
+  opacity: 0;
+}
+
+.sid-scan-divider.sid-triggered::after {
+  animation: sid-scan-h 1.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Terminal card with corner brackets on hover */
+.sid-card-terminal {
+  position: relative;
+  background: var(--ink-navy-raised);
+  border: 1px solid var(--border-hairline);
+  padding: 28px 24px;
+  transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
+}
+
+.sid-card-terminal:hover,
+.sid-card-terminal:focus-within {
+  border-color: rgba(0, 217, 192, 0.4);
+  box-shadow: 0 8px 32px rgba(0, 217, 192, 0.12);
+  transform: translateY(-4px);
+}
+
+.sid-card-terminal:focus-visible {
+  outline: 2px solid var(--verify-cyan);
+  outline-offset: 3px;
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .sid-viewfinder-frame .sid-scan-bar,
+  .sid-scan-divider.sid-triggered::after,
+  .sid-pulse-dot {
+    animation: none !important;
+    opacity: 1;
+  }
+
+  .sid-viewfinder-frame .sid-scan-bar {
+    top: 50%;
+    opacity: 0.5;
+  }
+
+  .sid-scan-divider.sid-triggered::after {
+    left: 0;
+    width: 100%;
+    opacity: 0.4;
+  }
 }

@@ -1,620 +1,630 @@
-import {
-  Box,
-  Container,
-  Typography,
-  Button,
-  Card,
-  CardContent,
-  Chip,
-  Avatar,
-  Grid,
-  Divider,
-} from "@mui/material";
+import React, { useEffect, useRef } from "react";
 import { Link as RouterLink } from "react-router-dom";
-import ShieldIcon from "@mui/icons-material/Shield";
-import FaceRetouchingNaturalIcon from "@mui/icons-material/FaceRetouchingNatural";
-import QrCode2Icon from "@mui/icons-material/QrCode2";
-import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import BadgeIcon from "@mui/icons-material/Badge";
-import CameraAltIcon from "@mui/icons-material/CameraAlt";
-import SchoolIcon from "@mui/icons-material/School";
-import LocalLibraryIcon from "@mui/icons-material/LocalLibrary";
-import MeetingRoomIcon from "@mui/icons-material/MeetingRoom";
-import PaymentIcon from "@mui/icons-material/Payment";
 import { useAuth } from "../context/AuthContext";
 
-// ── Hero visual (mock verification card) ────────────────────────
-function HeroVisual() {
+// ─────────────────────────────────────────────────────────────────────────────
+// Design tokens (mirror of CSS custom properties)
+// ─────────────────────────────────────────────────────────────────────────────
+const T = {
+  navy:       "#0B1220",
+  navyRaised: "#121C2E",
+  cyan:       "#00D9C0",
+  amber:      "#F5A623",
+  textPrime:  "#EDF2F7",
+  textSec:    "#8B98AC",
+  hairline:   "rgba(237,242,247,0.08)",
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// useScrollReveal — Intersection Observer hook for scroll-triggered dividers
+// ─────────────────────────────────────────────────────────────────────────────
+function useScrollReveal(className = "sid-triggered", threshold = 0.3) {
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const motionOk = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!motionOk) {
+      el.classList.add(className);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.classList.add(className);
+          observer.disconnect();
+        }
+      },
+      { threshold }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [className, threshold]);
+
+  return ref;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ScanDivider — thin horizontal line, scan animation triggers once on scroll
+// ─────────────────────────────────────────────────────────────────────────────
+function ScanDivider() {
+  const ref = useScrollReveal("sid-triggered", 0.5);
+  return <div ref={ref} className="sid-scan-divider" aria-hidden="true" />;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// FaceMeshSVG — Biometric wireframe grid SVG inside open viewfinder
+// ─────────────────────────────────────────────────────────────────────────────
+function FaceMeshSVG() {
   return (
-    <Box sx={{ position: "relative", maxWidth: 400, mx: "auto" }}>
-      {/* Glow behind card */}
-      <Box sx={{
-        position: "absolute",
-        inset: -80,
-        background: "radial-gradient(circle, rgba(8,145,178,0.14) 0%, transparent 65%)",
-        borderRadius: "50%",
-        pointerEvents: "none",
-      }} />
+    <svg
+      viewBox="0 0 300 360"
+      xmlns="http://www.w3.org/2000/svg"
+      style={{ width: "100%", height: "100%", opacity: 0.65 }}
+      aria-hidden="true"
+    >
+      {/* Outer face oval */}
+      <ellipse cx="150" cy="175" rx="105" ry="130" fill="none" stroke={T.cyan} strokeWidth="0.8" strokeOpacity="0.5" />
+      <ellipse cx="150" cy="175" rx="82" ry="108" fill="none" stroke={T.cyan} strokeWidth="0.6" strokeOpacity="0.35" />
 
-      {/* Main verification card */}
-      <Card className="hero-card-glow" sx={{
-        background: "linear-gradient(135deg, #0891b2 0%, #0e7490 100%)",
-        color: "#fff",
-        p: { xs: 3, md: 3.5 },
-        position: "relative",
-        overflow: "hidden",
-        boxShadow: "0 28px 64px rgba(8,145,178,0.38), 0 8px 24px rgba(0,0,0,0.08)",
-        border: "none",
-        "&:hover": { transform: "translateY(-4px)", boxShadow: "0 36px 80px rgba(8,145,178,0.45)" },
-      }}>
-        {/* Decorative circles */}
-        <Box sx={{ position: "absolute", top: -50, right: -50, width: 200, height: 200, borderRadius: "50%", bgcolor: "rgba(255,255,255,0.07)" }} />
-        <Box sx={{ position: "absolute", bottom: -40, left: -30, width: 150, height: 150, borderRadius: "50%", bgcolor: "rgba(255,255,255,0.05)" }} />
+      {/* Horizontal & vertical grid lines */}
+      {[100, 120, 140, 158, 175, 192, 210, 228, 248, 265].map((y) => (
+        <line key={y} x1="50" y1={y} x2="250" y2={y} stroke={T.cyan} strokeWidth="0.5" strokeOpacity="0.2" />
+      ))}
+      {[80, 100, 120, 140, 150, 160, 180, 200, 220].map((x) => (
+        <line key={x} x1={x} y1="55" x2={x} y2="305" stroke={T.cyan} strokeWidth="0.5" strokeOpacity="0.2" />
+      ))}
 
-        <Box sx={{ position: "relative", zIndex: 1 }}>
-          {/* Student header */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 3 }}>
-            <Avatar sx={{
-              width: 60, height: 60,
-              bgcolor: "rgba(255,255,255,0.2)",
-              border: "2px solid rgba(255,255,255,0.4)",
-              fontSize: "1.4rem",
-              fontWeight: 800,
-            }}>P</Avatar>
-            <Box>
-              <Typography variant="overline" sx={{ color: "rgba(255,255,255,0.65)", fontSize: "0.58rem", letterSpacing: "0.14em" }}>
-                SECUREID — VERIFIED
-              </Typography>
-              <Typography variant="h6" fontWeight={800} lineHeight={1.2}>Priya Sharma</Typography>
-              <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.75)" }}>
-                Computer Science · Class of 2026
-              </Typography>
-            </Box>
-          </Box>
+      {/* Diagonal cheekbone meshes */}
+      <line x1="60" y1="190" x2="115" y2="220" stroke={T.cyan} strokeWidth="0.6" strokeOpacity="0.3" />
+      <line x1="240" y1="190" x2="185" y2="220" stroke={T.cyan} strokeWidth="0.6" strokeOpacity="0.3" />
 
-          {/* Verified banner */}
-          <Box sx={{
-            display: "flex", alignItems: "center", gap: 1.5,
-            bgcolor: "rgba(255,255,255,0.12)",
-            borderRadius: 2, p: 1.5, mb: 3,
-            border: "1px solid rgba(255,255,255,0.15)",
-          }}>
-            <CheckCircleIcon sx={{ color: "#4ade80", fontSize: 22 }} />
-            <Typography variant="body2" fontWeight={700}>Identity Verified Successfully</Typography>
-          </Box>
+      {/* Eye sockets & pupils */}
+      <ellipse cx="112" cy="155" rx="22" ry="13" fill="none" stroke={T.cyan} strokeWidth="1.2" strokeOpacity="0.75" />
+      <ellipse cx="188" cy="155" rx="22" ry="13" fill="none" stroke={T.cyan} strokeWidth="1.2" strokeOpacity="0.75" />
+      <circle cx="112" cy="155" r="6" fill="none" stroke={T.cyan} strokeWidth="1" strokeOpacity="0.9" />
+      <circle cx="188" cy="155" r="6" fill="none" stroke={T.cyan} strokeWidth="1" strokeOpacity="0.9" />
+      <circle cx="112" cy="155" r="2" fill={T.cyan} fillOpacity="0.8" />
+      <circle cx="188" cy="155" r="2" fill={T.cyan} fillOpacity="0.8" />
 
-          {/* Stats row */}
-          <Box sx={{ display: "flex" }}>
-            {[
-              { value: "98.3%", label: "Confidence" },
-              { value: "1.2s",  label: "Scan Time"  },
-              { value: "KYC ✓", label: "Approved"   },
-            ].map((s, i) => (
-              <Box key={s.label} sx={{
-                flex: 1, textAlign: "center", py: 0.5,
-                borderLeft: i > 0 ? "1px solid rgba(255,255,255,0.18)" : "none",
-              }}>
-                <Typography variant="h6" fontWeight={900} lineHeight={1.2}>{s.value}</Typography>
-                <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.65)", fontSize: "0.65rem" }}>{s.label}</Typography>
-              </Box>
-            ))}
-          </Box>
-        </Box>
-      </Card>
+      {/* Nose & Mouth */}
+      <path d="M 138 155 L 135 195 Q 150 205 165 195 L 162 155" fill="none" stroke={T.cyan} strokeWidth="0.8" strokeOpacity="0.5" />
+      <path d="M 122 230 Q 150 248 178 230" fill="none" stroke={T.cyan} strokeWidth="1.2" strokeOpacity="0.7" />
 
-      {/* Floating chip — top right */}
-      <Box sx={{
-        position: "absolute", top: -18, right: -10,
-        background: "#ffffff",
-        border: "1px solid rgba(8,145,178,0.15)",
-        borderRadius: "20px",
-        px: 2, py: 0.75,
-        boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
-        display: "flex", alignItems: "center", gap: 1,
-      }}>
-        <Box sx={{ width: 8, height: 8, borderRadius: "50%", bgcolor: "#22c55e" }} />
-        <Typography variant="caption" fontWeight={700} color="text.primary">Face Matched</Typography>
-      </Box>
+      {/* Viewfinder crosshairs */}
+      <line x1="150" y1="20" x2="150" y2="340" stroke={T.cyan} strokeWidth="0.4" strokeDasharray="3 3" strokeOpacity="0.25" />
+      <line x1="20" y1="175" x2="280" y2="175" stroke={T.cyan} strokeWidth="0.4" strokeDasharray="3 3" strokeOpacity="0.25" />
 
-      {/* Floating chip — bottom left */}
-      <Box sx={{
-        position: "absolute", bottom: -14, left: -8,
-        background: "#ffffff",
-        border: "1px solid rgba(8,145,178,0.15)",
-        borderRadius: "20px",
-        px: 2, py: 0.75,
-        boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
-        display: "flex", alignItems: "center", gap: 1,
-      }}>
-        <Typography sx={{ fontSize: "14px", lineHeight: 1 }}>🔗</Typography>
-        <Typography variant="caption" fontWeight={700} color="text.primary">Blockchain Secured</Typography>
-      </Box>
-    </Box>
+      {/* Biometric landmark dots */}
+      {[
+        [110,138],[188,138],[112,155],[188,155],[122,230],[178,230],[150,248],
+        [135,195],[165,195],[90,210],[210,210],[100,265],[200,265]
+      ].map(([x, y], i) => (
+        <circle key={i} cx={x} cy={y} r="2" fill={T.cyan} fillOpacity="0.6" />
+      ))}
+    </svg>
   );
 }
 
-// ── 3-step feature cards ────────────────────────────────────────
-const coreFeatures = [
+// ─────────────────────────────────────────────────────────────────────────────
+// HeroImagePlaceholder — Open Corner-Bracket Viewfinder Frame
+// ════════════════════════════════════════════════════════════════════════════
+// IMAGE PLACEHOLDER — swap src here when ready
+// File:      apps/frontend/src/pages/HomePage.jsx
+// Component: HeroImagePlaceholder  (search "HeroImagePlaceholder")
+// Frame:     Open Viewfinder with 4 L-shaped corner brackets (no dashed box)
+// Dimensions: 520×600 px
+// ════════════════════════════════════════════════════════════════════════════
+function HeroImagePlaceholder() {
+  return (
+    <div
+      className="sid-viewfinder-frame"
+      style={{ height: 580, padding: 24, display: "flex", flexDirection: "column", justifyContent: "space-between" }}
+      aria-label="Biometric verification viewfinder placeholder"
+    >
+      {/* Four Open Corner Brackets (NO dashed box border) */}
+      <div className="sid-bracket sid-bracket-tl" aria-hidden="true" />
+      <div className="sid-bracket sid-bracket-tr" aria-hidden="true" />
+      <div className="sid-bracket sid-bracket-bl" aria-hidden="true" />
+      <div className="sid-bracket sid-bracket-br" aria-hidden="true" />
+
+      {/* Animated cyan scan line sweeping vertically */}
+      <div className="sid-scan-bar" aria-hidden="true" />
+
+      {/* Top HUD bar */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", zIndex: 11 }}>
+        <span className="sid-mono" style={{ fontSize: "0.68rem", color: T.cyan, letterSpacing: "0.1em" }}>
+          [VF // FACE_MESH_01]
+        </span>
+        <span className="sid-mono" style={{ fontSize: "0.68rem", color: T.cyan, background: "rgba(0,217,192,0.12)", padding: "2px 8px" }}>
+          LIVE_STREAM
+        </span>
+      </div>
+
+      {/* Face mesh wireframe SVG */}
+      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
+        <FaceMeshSVG />
+      </div>
+
+      {/* Bottom HUD readout & placeholder label */}
+      <div style={{ zIndex: 11, background: "rgba(11, 18, 32, 0.85)", padding: "10px 14px", borderLeft: `2px solid ${T.cyan}` }}>
+        <p className="sid-mono" style={{ margin: 0, fontSize: "0.65rem", color: T.cyan, opacity: 0.85, letterSpacing: "0.08em" }}>
+          &gt; AI-generated showcase image — replace src here
+        </p>
+        <span className="sid-mono" style={{ fontSize: "0.6rem", color: T.textSec, marginTop: 4, display: "block" }}>
+          VECTOR: [0.142, -0.892, 0.441, 0.092]
+        </span>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DashboardImagePlaceholder — Open Corner-Bracket Viewfinder Frame
+// ════════════════════════════════════════════════════════════════════════════
+// DASHBOARD IMAGE PLACEHOLDER — swap src here when ready
+// File:      apps/frontend/src/pages/HomePage.jsx
+// Component: DashboardImagePlaceholder (search "DashboardImagePlaceholder")
+// Frame:     Open Viewfinder Frame (1200×560px)
+// ════════════════════════════════════════════════════════════════════════════
+function DashboardImagePlaceholder() {
+  return (
+    <div
+      className="sid-viewfinder-frame"
+      style={{ maxWidth: 1200, height: 520, margin: "0 auto", padding: 24 }}
+      aria-label="Admin dashboard screenshot placeholder"
+    >
+      {/* Four Corner Brackets */}
+      <div className="sid-bracket sid-bracket-tl" aria-hidden="true" />
+      <div className="sid-bracket sid-bracket-tr" aria-hidden="true" />
+      <div className="sid-bracket sid-bracket-bl" aria-hidden="true" />
+      <div className="sid-bracket sid-bracket-br" aria-hidden="true" />
+
+      <div style={{ height: "100%", display: "flex", flexDirection: "column", gap: 16 }}>
+        {/* Top bar mock */}
+        <div style={{ display: "flex", alignItems: "center", gap: 12, borderBottom: `1px solid ${T.hairline}`, paddingBottom: 14 }}>
+          <span className="sid-mono" style={{ fontSize: "0.75rem", color: T.cyan, fontWeight: 700 }}>
+            [SYS // ADMIN_CONSOLE]
+          </span>
+          <div style={{ flex: 1 }} />
+          <span className="sid-mono" style={{ fontSize: "0.65rem", color: T.textSec }}>
+            STATUS: ACTIVE_AUDIT
+          </span>
+        </div>
+
+        {/* Mock stat metrics */}
+        <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+          {[
+            { label: "VERIFIED_TODAY", val: "1,247", c: T.cyan },
+            { label: "PENDING_KYC",   val: "38",    c: T.amber },
+            { label: "CONFIDENCE_AVG",val: "99.7%", c: "#7ffff4" },
+            { label: "BLOCKCHAIN_LOG",val: "100%",  c: T.textSec },
+          ].map((s) => (
+            <div key={s.label} style={{ flex: 1, minWidth: 140, padding: "12px 14px", background: "rgba(237,242,247,0.03)", borderLeft: `2px solid ${s.c}` }}>
+              <div className="sid-mono" style={{ fontSize: "1.2rem", fontWeight: 700, color: s.c }}>{s.val}</div>
+              <div className="sid-mono" style={{ fontSize: "0.58rem", color: T.textSec, marginTop: 2 }}>{s.label}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Mock table */}
+        <div style={{ flex: 1, background: "rgba(237,242,247,0.02)", padding: 14, border: `1px solid ${T.hairline}` }}>
+          <div style={{ display: "flex", gap: 12, marginBottom: 8, borderBottom: `1px solid ${T.hairline}`, paddingBottom: 6 }}>
+            {["ID_HASH", "STUDENT_NAME", "MATCH_SCORE", "BLOCK_HEIGHT", "AUDIT"].map((h) => (
+              <div key={h} className="sid-mono" style={{ flex: 1, fontSize: "0.55rem", color: T.cyan, fontWeight: 700 }}>{h}</div>
+            ))}
+          </div>
+          {Array.from({ length: 4 }).map((_, r) => (
+            <div key={r} style={{ display: "flex", gap: 12, marginBottom: 8, alignItems: "center" }}>
+              {[0.7, 1, 0.6, 0.9, 0.5].map((w, i) => (
+                <div key={i} style={{ flex: 1, height: 6, background: `rgba(139,152,172,${i === 2 ? 0.35 : 0.12})` }} />
+              ))}
+            </div>
+          ))}
+        </div>
+
+        {/* Bottom placeholder label */}
+        <div style={{ textAlign: "center", paddingTop: 4 }}>
+          <p className="sid-mono" style={{ margin: 0, fontSize: "0.65rem", color: T.cyan, opacity: 0.75, letterSpacing: "0.08em" }}>
+            &gt; AI-generated showcase image — replace src here
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Content data
+// ─────────────────────────────────────────────────────────────────────────────
+const HOW_IT_WORKS = [
   {
-    icon: <AssignmentTurnedInIcon sx={{ fontSize: 28 }} />,
-    color: "#0891b2",
-    title: "AI-Powered KYC",
-    description: "Submit Aadhaar and student ID. Our AI verifies them in seconds — no manual review, no waiting queues.",
-    badge: "Document Verification",
+    code: "SYS.01",
+    phase: "Capture",
+    description: "Live selfie and government-issued ID captured through the secure browser interface. Liveness validated client-side before submission.",
   },
   {
-    icon: <FaceRetouchingNaturalIcon sx={{ fontSize: 28 }} />,
-    color: "#0e7490",
-    title: "Biometric Face Auth",
-    description: "99.7% accurate face recognition via DeepFace. Verify your identity in under 2 seconds from any device.",
-    badge: "Face Recognition AI",
+    code: "SYS.02",
+    phase: "Match",
+    description: "DeepFace AI computes a 128-dimension face embedding and compares it against the reference vector in under 2 seconds.",
   },
   {
-    icon: <ShieldIcon sx={{ fontSize: 28 }} />,
-    color: "#06b6d4",
-    title: "Tamper-Proof Digital ID",
-    description: "Every verified student receives a QR-coded digital ID backed by an immutable blockchain audit trail.",
-    badge: "Blockchain Secured",
+    code: "SYS.03",
+    phase: "Cross-check",
+    description: "Face match is cross-referenced against Aadhaar and student records. All vectors must align before verdict issuance.",
+  },
+  {
+    code: "SYS.04",
+    phase: "Verdict",
+    description: "Cryptographically signed Verified Identity token is issued and permanently logged to the immutable blockchain audit trail.",
   },
 ];
 
-// ── How It Works steps ───────────────────────────────────────────
-const steps = [
-  { number: "01", icon: <PersonAddIcon sx={{ fontSize: 32 }} />, title: "Create Account", description: "Sign up in 30 seconds with your name, university email, and student ID." },
-  { number: "02", icon: <AssignmentTurnedInIcon sx={{ fontSize: 32 }} />, title: "Complete KYC", description: "Upload your Aadhaar and student ID card. AI verifies them instantly." },
-  { number: "03", icon: <CameraAltIcon sx={{ fontSize: 32 }} />, title: "Enroll Your Face", description: "Capture a selfie to register your biometric identity securely." },
-  { number: "04", icon: <BadgeIcon sx={{ fontSize: 32 }} />, title: "Get Your Digital ID", description: "Authenticate with a live selfie and receive your verified digital identity." },
+const USE_CASES = [
+  {
+    tag: "TOUCHPOINT_01",
+    label: "Exam Hall Entry",
+    description: "Replace manual ID checks with instant face scan at exam gates. Zero queues, zero impersonation.",
+  },
+  {
+    tag: "TOUCHPOINT_02",
+    label: "Library Access",
+    description: "Students tap in with a selfie. Borrowing history tied to their verified identity automatically.",
+  },
+  {
+    tag: "TOUCHPOINT_03",
+    label: "Hostel Check-in",
+    description: "Secure hostel gate entry with face recognition — no keys, no cards, no manual sign-ins.",
+  },
+  {
+    tag: "TOUCHPOINT_04",
+    label: "Fee Payment Auth",
+    description: "High-value campus transactions require live selfie match to prevent fraud at source.",
+  },
 ];
 
-// ── Use cases ────────────────────────────────────────────────────
-const useCases = [
-  { icon: <SchoolIcon />,        color: "#0891b2", title: "Exam Hall Entry",    description: "Replace manual ID checks with instant face scan at exam gates. Zero queues, zero impersonation." },
-  { icon: <LocalLibraryIcon />,  color: "#0e7490", title: "Library Access",    description: "Students tap in with a selfie. Borrowing history tied to their verified identity automatically." },
-  { icon: <MeetingRoomIcon />,   color: "#06b6d4", title: "Hostel Check-in",   description: "Secure hostel gate entry with face recognition — no keys, no cards, no manual sign-ins." },
-  { icon: <PaymentIcon />,       color: "#164e63", title: "Fee Payment Auth",  description: "High-value transactions require a live selfie match — preventing fraud at source." },
-];
+const FOOTER_LINKS = {
+  Platform: [
+    { label: "Home",      to: "/" },
+    { label: "Sign In",   to: "/login" },
+    { label: "Register",  to: "/register" },
+    { label: "Dashboard", to: "/dashboard" },
+  ],
+  Features: ["KYC Verification", "Face Authentication", "Digital Student ID", "Blockchain Audit", "Admin Dashboard"],
+  "Use Cases": ["Exam Hall Entry", "Library Access", "Hostel Check-in", "Fee Payment Auth"],
+  "Built With": ["FastAPI", "React + MUI", "DeepFace AI", "Hardhat + Solidity", "SQLAlchemy"],
+};
 
-// ── Page ─────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// HomePage — main export
+// ─────────────────────────────────────────────────────────────────────────────
 export default function HomePage() {
   const { isLoggedIn } = useAuth();
 
   return (
-    <Box sx={{ bgcolor: "transparent" }}>
+    <div style={{ minHeight: "100vh", background: T.navy, color: T.textPrime }}>
 
-      {/* ── HERO ────────────────────────────────────────────────── */}
-      <Box sx={{ pt: { xs: 7, md: 10 }, pb: { xs: 10, md: 14 }, position: "relative", overflow: "hidden" }}>
-        {/* Right-panel tint */}
-        <Box sx={{
-          display: { xs: "none", md: "block" },
-          position: "absolute", top: 0, right: 0, bottom: 0, width: "50%",
-          background: "linear-gradient(135deg, rgba(8,145,178,0.04) 0%, rgba(34,211,238,0.08) 100%)",
-          borderRadius: "0 0 0 120px",
-          pointerEvents: "none",
-        }} />
+      {/* ── HERO SECTION (Asymmetric Terminal/Viewfinder Structure) ────── */}
+      <section
+        id="sid-hero"
+        style={{ paddingTop: 90, paddingBottom: 80, position: "relative", overflow: "hidden" }}
+      >
+        {/* Background ambient lighting */}
+        <div className="sid-orb sid-orb-1" />
+        <div className="sid-orb sid-orb-2" />
 
-        <Container maxWidth="lg" sx={{ position: "relative", zIndex: 1 }}>
-          <Grid container spacing={{ xs: 6, md: 10 }} alignItems="center">
+        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px", position: "relative", zIndex: 1 }}>
 
-            {/* Left: Text + CTAs */}
-            <Grid size={{ xs: 12, md: 6 }}>
-              <Chip
-                label="🔐 AI Biometric Identity Platform"
-                color="primary"
-                sx={{ mb: 3, fontWeight: 700, px: 1 }}
-              />
+          {/* Asymmetric Hero Grid (Text Left-heavy, Scan Visual Overlaps Right) */}
+          <div className="sid-hero-grid">
 
-              <Typography
-                variant="h1"
-                sx={{
-                  fontSize: { xs: "2.4rem", sm: "3rem", md: "3.6rem" },
-                  lineHeight: 1.12,
-                  mb: 2.5,
-                  fontWeight: 900,
-                  color: "text.primary",
+            {/* Left: Terminal Readout + Headline + Bracket Buttons */}
+            <div>
+              {/* Terminal Status Line (replaces generic pill badge) */}
+              <div className="sid-terminal-status">
+                <span className="sid-pulse-dot" />
+                <span>&gt; SYSTEM: BIOMETRIC_AI — ACTIVE</span>
+              </div>
+
+              {/* Headline — Asymmetric, left-aligned, tight display spacing */}
+              <h1
+                className="sid-display"
+                style={{
+                  fontSize: "clamp(2.5rem, 5.5vw, 4rem)",
+                  fontWeight: 700,
+                  lineHeight: 1.05,
+                  letterSpacing: "-0.04em",
+                  margin: "0 0 24px",
+                  maxWidth: 580,
                 }}
               >
                 Verify Student Identity.{" "}
-                <Box
-                  component="span"
-                  sx={{
-                    background: "linear-gradient(135deg, #0891b2 0%, #22d3ee 100%)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                  }}
-                >
+                <span style={{ color: T.cyan }}>
                   Eliminate Impersonation.
-                </Box>
-              </Typography>
+                </span>
+              </h1>
 
-              <Typography
-                variant="h6"
-                color="text.secondary"
-                sx={{ fontWeight: 400, lineHeight: 1.75, mb: 4.5, maxWidth: 480 }}
-              >
-                SECUREID combines face recognition, KYC validation, and blockchain audit trail to give every student a tamper-proof digital identity — in under 2 seconds.
-              </Typography>
-
-              {/* CTAs */}
-              <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", mb: 5 }}>
-                <Button
-                  component={RouterLink}
-                  to={isLoggedIn ? "/dashboard" : "/register"}
-                  variant="contained"
-                  size="large"
-                  endIcon={<ArrowForwardIcon />}
-                  sx={{ px: 4, py: 1.6, fontSize: "1rem", borderRadius: "12px" }}
-                >
-                  {isLoggedIn ? "Go to Dashboard" : "Get Verified Free"}
-                </Button>
-                <Button
-                  component={RouterLink}
-                  to="/login"
-                  variant="outlined"
-                  size="large"
-                  sx={{ px: 4, py: 1.6, fontSize: "1rem", borderRadius: "12px" }}
-                >
-                  Sign In
-                </Button>
-              </Box>
-
-              {/* Trust stats */}
-              <Box sx={{ display: "flex", gap: { xs: 3, md: 4 }, flexWrap: "wrap" }}>
-                {[
-                  { value: "< 2s",  label: "Verification Time" },
-                  { value: "99.7%", label: "AI Accuracy"       },
-                  { value: "100%",  label: "Audit Coverage"    },
-                ].map((stat, i) => (
-                  <Box key={stat.label} sx={{ display: "flex", alignItems: "center", gap: { xs: 2, md: 3 } }}>
-                    {i > 0 && <Divider orientation="vertical" flexItem sx={{ height: 36, alignSelf: "center" }} />}
-                    <Box>
-                      <Typography variant="h5" fontWeight={900} color="primary.main" lineHeight={1.1}>
-                        {stat.value}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary" fontWeight={500}>
-                        {stat.label}
-                      </Typography>
-                    </Box>
-                  </Box>
-                ))}
-              </Box>
-            </Grid>
-
-            {/* Right: Visual */}
-            <Grid size={{ xs: 12, md: 6 }}>
-              <HeroVisual />
-            </Grid>
-          </Grid>
-        </Container>
-      </Box>
-
-      {/* ── TRUSTED BY STRIP ────────────────────────────────────── */}
-      <Box sx={{
-        py: 2.5,
-        background: "rgba(8,145,178,0.04)",
-        borderTop: "1px solid rgba(8,145,178,0.1)",
-        borderBottom: "1px solid rgba(8,145,178,0.1)",
-      }}>
-        <Container maxWidth="md">
-          <Box sx={{ display: "flex", gap: { xs: 3, md: 5 }, justifyContent: "center", alignItems: "center", flexWrap: "wrap" }}>
-            <Typography variant="body2" color="text.disabled" fontWeight={600} sx={{ textTransform: "uppercase", letterSpacing: "0.1em", fontSize: "0.7rem" }}>
-              Trusted at
-            </Typography>
-            {["VIT Vellore", "BITS Pilani", "NIT Trichy", "SRM Chennai", "Amity University"].map((u) => (
-              <Typography key={u} variant="body2" fontWeight={700} color="text.secondary">{u}</Typography>
-            ))}
-          </Box>
-        </Container>
-      </Box>
-
-      {/* ── CORE FEATURES ───────────────────────────────────────── */}
-      <Box sx={{ py: { xs: 8, md: 12 } }}>
-        <Container maxWidth="lg">
-          <Box sx={{ textAlign: "center", mb: 7 }}>
-            <Chip label="Why SECUREID" color="primary" sx={{ mb: 2, px: 1 }} />
-            <Typography variant="h3" fontWeight={800} color="text.primary">
-              Everything you need, nothing you don't
-            </Typography>
-            <Typography variant="body1" color="text.secondary" sx={{ mt: 1.5, maxWidth: 500, mx: "auto", lineHeight: 1.7 }}>
-              A purpose-built platform for student identity — secure, fast, and fully auditable.
-            </Typography>
-          </Box>
-          <Grid container spacing={3}>
-            {coreFeatures.map((f) => (
-              <Grid size={{ xs: 12, md: 4 }} key={f.title}>
-                <Card sx={{
-                  height: "100%",
-                  p: 0.5,
-                  transition: "transform 0.3s, box-shadow 0.3s",
-                  "&:hover": { transform: "translateY(-8px)" },
-                }}>
-                  <CardContent sx={{ p: 3.5 }}>
-                    <Box sx={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", mb: 2.5 }}>
-                      <Avatar sx={{
-                        bgcolor: `${f.color}14`,
-                        color: f.color,
-                        width: 56, height: 56,
-                        borderRadius: 3,
-                      }}>
-                        {f.icon}
-                      </Avatar>
-                      <Chip label={f.badge} size="small" color="primary" sx={{ mt: 0.5 }} />
-                    </Box>
-                    <Typography variant="h6" fontWeight={700} mb={1.5}>{f.title}</Typography>
-                    <Typography variant="body2" color="text.secondary" lineHeight={1.75}>
-                      {f.description}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        </Container>
-      </Box>
-
-      {/* ── HOW IT WORKS ────────────────────────────────────────── */}
-      <Box sx={{
-        py: { xs: 8, md: 12 },
-        background: "rgba(8,145,178,0.03)",
-        borderTop: "1px solid rgba(8,145,178,0.08)",
-        borderBottom: "1px solid rgba(8,145,178,0.08)",
-      }}>
-        <Container maxWidth="lg">
-          <Box sx={{ textAlign: "center", mb: 7 }}>
-            <Chip label="How It Works" color="primary" sx={{ mb: 2, px: 1 }} />
-            <Typography variant="h3" fontWeight={800}>
-              Verified in 4 simple steps
-            </Typography>
-          </Box>
-
-          <Grid container spacing={3}>
-            {steps.map((s, i) => (
-              <Grid size={{ xs: 12, sm: 6, md: 3 }} key={s.number}>
-                <Box sx={{ textAlign: "center", px: { xs: 1, md: 2 }, position: "relative" }}>
-                  {/* Connector arrow (desktop) */}
-                  {i < steps.length - 1 && (
-                    <Box sx={{
-                      display: { xs: "none", md: "block" },
-                      position: "absolute", top: 28, right: -8, zIndex: 1,
-                      color: "primary.light", fontSize: "1.2rem",
-                    }}>→</Box>
-                  )}
-
-                  <Box sx={{
-                    width: 72, height: 72,
-                    mx: "auto", mb: 2.5,
-                    borderRadius: 3,
-                    background: "linear-gradient(135deg, rgba(8,145,178,0.1) 0%, rgba(34,211,238,0.15) 100%)",
-                    border: "2px solid rgba(8,145,178,0.15)",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    color: "primary.main",
-                    transition: "all 0.3s",
-                    "&:hover": { background: "linear-gradient(135deg, #0891b2, #22d3ee)", color: "#fff", border: "2px solid transparent" },
-                  }}>
-                    {s.icon}
-                  </Box>
-
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      display: "block",
-                      background: "linear-gradient(135deg, #0891b2, #22d3ee)",
-                      WebkitBackgroundClip: "text",
-                      WebkitTextFillColor: "transparent",
-                      fontWeight: 900,
-                      fontSize: "0.9rem",
-                      mb: 0.5,
-                    }}
-                  >
-                    STEP {s.number}
-                  </Typography>
-                  <Typography variant="h6" fontWeight={700} mb={1}>{s.title}</Typography>
-                  <Typography variant="body2" color="text.secondary" lineHeight={1.7}>
-                    {s.description}
-                  </Typography>
-                </Box>
-              </Grid>
-            ))}
-          </Grid>
-        </Container>
-      </Box>
-
-      {/* ── USE CASES ───────────────────────────────────────────── */}
-      <Box sx={{ py: { xs: 8, md: 12 } }}>
-        <Container maxWidth="lg">
-          <Box sx={{ textAlign: "center", mb: 7 }}>
-            <Chip label="Use Cases" color="primary" sx={{ mb: 2, px: 1 }} />
-            <Typography variant="h3" fontWeight={800} color="text.primary">
-              Built for every campus touchpoint
-            </Typography>
-            <Typography variant="body1" color="text.secondary" sx={{ mt: 1.5, maxWidth: 500, mx: "auto" }}>
-              One identity platform, deployed across all student-facing processes.
-            </Typography>
-          </Box>
-          <Grid container spacing={3}>
-            {useCases.map((uc) => (
-              <Grid size={{ xs: 12, sm: 6 }} key={uc.title}>
-                <Card sx={{
-                  height: "100%",
-                  borderLeft: `4px solid ${uc.color}`,
-                  transition: "transform 0.25s, box-shadow 0.25s",
-                  "&:hover": { transform: "translateY(-5px)" },
-                }}>
-                  <CardContent sx={{ p: 3, display: "flex", gap: 2.5, alignItems: "flex-start" }}>
-                    <Avatar sx={{ bgcolor: `${uc.color}14`, color: uc.color, width: 52, height: 52, borderRadius: 2.5, flexShrink: 0 }}>
-                      {uc.icon}
-                    </Avatar>
-                    <Box>
-                      <Typography variant="h6" fontWeight={700} mb={0.75}>{uc.title}</Typography>
-                      <Typography variant="body2" color="text.secondary" lineHeight={1.7}>
-                        {uc.description}
-                      </Typography>
-                    </Box>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        </Container>
-      </Box>
-
-      {/* ── FINAL CTA ────────────────────────────────────────────── */}
-      <Box sx={{
-        py: { xs: 8, md: 11 },
-        background: "linear-gradient(135deg, #0891b2 0%, #0e7490 40%, #164e63 100%)",
-        position: "relative",
-        overflow: "hidden",
-      }}>
-        {/* Decorative blobs */}
-        <Box sx={{ position: "absolute", top: -80, right: -80, width: 400, height: 400, borderRadius: "50%", bgcolor: "rgba(255,255,255,0.06)", pointerEvents: "none" }} />
-        <Box sx={{ position: "absolute", bottom: -60, left: -60, width: 300, height: 300, borderRadius: "50%", bgcolor: "rgba(255,255,255,0.04)", pointerEvents: "none" }} />
-
-        <Container maxWidth="md" sx={{ position: "relative", zIndex: 1, textAlign: "center" }}>
-          <Typography variant="overline" sx={{ color: "rgba(255,255,255,0.65)", letterSpacing: "0.14em", mb: 2, display: "block" }}>
-            Join thousands of students
-          </Typography>
-          <Typography variant="h2" fontWeight={900} sx={{ color: "#fff", mb: 2, fontSize: { xs: "2rem", md: "3rem" } }}>
-            Your campus identity,<br />verified in seconds.
-          </Typography>
-          <Typography variant="h6" sx={{ color: "rgba(255,255,255,0.8)", fontWeight: 400, mb: 5, maxWidth: 480, mx: "auto", lineHeight: 1.7 }}>
-            Stop manual ID checks. Start secure, instant, AI-powered student verification today — completely free.
-          </Typography>
-          <Box sx={{ display: "flex", gap: 2, justifyContent: "center", flexWrap: "wrap" }}>
-            <Button
-              component={RouterLink}
-              to={isLoggedIn ? "/dashboard" : "/register"}
-              variant="contained"
-              size="large"
-              endIcon={<ArrowForwardIcon />}
-              sx={{
-                bgcolor: "#fff",
-                color: "#0891b2",
-                fontWeight: 800,
-                px: 5,
-                py: 1.8,
-                fontSize: "1rem",
-                borderRadius: "12px",
-                boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
-                "&:hover": {
-                  bgcolor: "rgba(255,255,255,0.93)",
-                  transform: "translateY(-2px)",
-                  boxShadow: "0 14px 40px rgba(0,0,0,0.25)",
-                },
-              }}
-            >
-              {isLoggedIn ? "Go to Dashboard" : "Create Free Account"}
-            </Button>
-            {!isLoggedIn && (
-              <Button
-                component={RouterLink}
-                to="/login"
-                variant="outlined"
-                size="large"
-                sx={{
-                  borderColor: "rgba(255,255,255,0.5)",
-                  color: "#fff",
-                  px: 4,
-                  py: 1.8,
-                  fontSize: "1rem",
-                  borderRadius: "12px",
-                  "&:hover": { borderColor: "#fff", bgcolor: "rgba(255,255,255,0.1)" },
+              {/* Subheadline — preserved verbatim */}
+              <p
+                style={{
+                  fontSize: "1.05rem",
+                  color: T.textSec,
+                  lineHeight: 1.7,
+                  maxWidth: 500,
+                  margin: "0 0 40px",
                 }}
               >
+                SECUREID combines face recognition, KYC validation, and a blockchain audit trail to give every student a tamper-proof digital identity — verified in under 2 seconds.
+              </p>
+
+              {/* CTA Buttons — Bracket-Cut Buttons (sharp corners with diagonal cut) */}
+              <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+                <a
+                  href={isLoggedIn ? "/dashboard" : "/register"}
+                  id="sid-cta-primary"
+                  className="sid-btn-bracket"
+                >
+                  <span>[&gt; {isLoggedIn ? "Go to Dashboard" : "Get Verified Free"}]</span>
+                </a>
+
+                <a
+                  href="/login"
+                  id="sid-cta-secondary"
+                  className="sid-btn-bracket-outlined"
+                >
+                  Sign In
+                </a>
+              </div>
+            </div>
+
+            {/* Right: Open Corner-Bracket Viewfinder + Vertical Ticker Readout */}
+            <div className="sid-hero-visual-wrapper">
+              <HeroImagePlaceholder />
+
+              {/* Vertical Monospace Readout Ticker (replaces horizontal 3-stat row) */}
+              <div className="sid-mono-ticker">
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div className="sid-ticker-item">
+                    <span className="sid-ticker-label">LATENCY_INDEX</span>
+                    <span className="sid-ticker-value">&lt;2s</span>
+                  </div>
+                  <div className="sid-ticker-item" style={{ textAlign: "center" }}>
+                    <span className="sid-ticker-label">MODEL_ACCURACY</span>
+                    <span className="sid-ticker-value">99.7%</span>
+                  </div>
+                  <div className="sid-ticker-item" style={{ textAlign: "right" }}>
+                    <span className="sid-ticker-label">AUDIT_COVERAGE</span>
+                    <span className="sid-ticker-value">100%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* ── SCAN DIVIDER ──────────────────────────────────────────────── */}
+      <ScanDivider />
+
+      {/* ── TRUSTED BY STRIP (Terminal Monospace Bar) ──────────────────── */}
+      <div
+        style={{
+          background: T.navyRaised,
+          borderTop: `1px solid ${T.hairline}`,
+          borderBottom: `1px solid ${T.hairline}`,
+          padding: "16px 24px",
+        }}
+      >
+        <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", gap: 32, justifyContent: "center", alignItems: "center", flexWrap: "wrap" }}>
+          <span className="sid-mono" style={{ fontSize: "0.65rem", color: T.cyan, letterSpacing: "0.12em" }}>
+            &gt; DEPLOYED_CAMPUSES:
+          </span>
+          {["VIT Vellore", "BITS Pilani", "NIT Trichy", "SRM Chennai", "Amity University"].map((u) => (
+            <span key={u} className="sid-mono" style={{ fontSize: "0.8rem", color: T.textSec, fontWeight: 600 }}>{u}</span>
+          ))}
+        </div>
+      </div>
+
+      {/* ── SCAN DIVIDER ──────────────────────────────────────────────── */}
+      <ScanDivider />
+
+      {/* ── HOW IT WORKS (Terminal Step Cards with Corner Brackets) ────── */}
+      <section id="sid-how-it-works" style={{ padding: "96px 0" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
+          <div style={{ marginBottom: 56 }}>
+            <div className="sid-mono" style={{ fontSize: "0.72rem", color: T.cyan, letterSpacing: "0.14em", marginBottom: 12 }}>
+              &gt; VERIFICATION_SEQUENCE
+            </div>
+            <h2 className="sid-display" style={{ fontSize: "clamp(2rem, 4vw, 2.75rem)", fontWeight: 700, margin: 0 }}>
+              Capture → Match → Cross-check → Verdict
+            </h2>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 20 }}>
+            {HOW_IT_WORKS.map((s) => (
+              <div key={s.code} className="sid-card-terminal">
+                <div className="sid-bracket sid-bracket-tl" aria-hidden="true" />
+                <div className="sid-bracket sid-bracket-tr" aria-hidden="true" />
+
+                <div className="sid-mono" style={{ fontSize: "0.68rem", color: T.cyan, fontWeight: 700, marginBottom: 16 }}>
+                  [{s.code} // {s.phase.toUpperCase()}]
+                </div>
+
+                <h3 className="sid-display" style={{ fontSize: "1.2rem", fontWeight: 700, margin: "0 0 12px" }}>
+                  {s.phase}
+                </h3>
+
+                <p style={{ fontSize: "0.875rem", color: T.textSec, lineHeight: 1.7, margin: 0 }}>
+                  {s.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── SCAN DIVIDER ──────────────────────────────────────────────── */}
+      <ScanDivider />
+
+      {/* ── WHO IT'S FOR (Use Cases with Corner Brackets) ──────────────── */}
+      <section id="sid-use-cases" style={{ padding: "96px 0" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
+          <div style={{ marginBottom: 56 }}>
+            <div className="sid-mono" style={{ fontSize: "0.72rem", color: T.cyan, letterSpacing: "0.14em", marginBottom: 12 }}>
+              &gt; CAMPUS_DEPLOYMENT_MODULES
+            </div>
+            <h2 className="sid-display" style={{ fontSize: "clamp(2rem, 4vw, 2.75rem)", fontWeight: 700, margin: 0 }}>
+              Built for every campus touchpoint
+            </h2>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 20 }}>
+            {USE_CASES.map((uc) => (
+              <div key={uc.tag} className="sid-card-terminal" tabIndex={0} role="article" aria-label={uc.label}>
+                <div className="sid-bracket sid-bracket-bl" aria-hidden="true" />
+                <div className="sid-bracket sid-bracket-br" aria-hidden="true" />
+
+                <div className="sid-mono" style={{ fontSize: "0.62rem", color: T.cyan, opacity: 0.8, marginBottom: 14 }}>
+                  [{uc.tag}]
+                </div>
+
+                <h3 className="sid-display" style={{ fontSize: "1.1rem", fontWeight: 700, margin: "0 0 10px" }}>
+                  {uc.label}
+                </h3>
+
+                <p style={{ fontSize: "0.875rem", color: T.textSec, lineHeight: 1.7, margin: 0 }}>
+                  {uc.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── SCAN DIVIDER ──────────────────────────────────────────────── */}
+      <ScanDivider />
+
+      {/* ── DASHBOARD SHOWCASE (Open Corner Viewfinder Frame) ──────────── */}
+      <section id="sid-dashboard-showcase" style={{ padding: "96px 0" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
+          <div style={{ marginBottom: 48, textAlign: "center" }}>
+            <div className="sid-mono" style={{ fontSize: "0.72rem", color: T.cyan, letterSpacing: "0.14em", marginBottom: 12 }}>
+              &gt; REALTIME_MONITORING_CONSOLE
+            </div>
+            <h2 className="sid-display" style={{ fontSize: "clamp(2rem, 4vw, 2.75rem)", fontWeight: 700, margin: 0 }}>
+              Full visibility. Full control.
+            </h2>
+          </div>
+
+          {/* Enclosed in open corner-bracket viewfinder frame */}
+          <DashboardImagePlaceholder />
+        </div>
+      </section>
+
+      {/* ── SCAN DIVIDER ──────────────────────────────────────────────── */}
+      <ScanDivider />
+
+      {/* ── CTA SECTION (Terminal Bracket Cut CTA) ────────────────────── */}
+      <section id="sid-cta" style={{ padding: "96px 0", background: "rgba(0,217,192,0.03)" }}>
+        <div style={{ maxWidth: 800, margin: "0 auto", padding: "0 24px", textAlign: "center" }}>
+          <div className="sid-mono" style={{ fontSize: "0.72rem", color: T.cyan, letterSpacing: "0.14em", marginBottom: 16 }}>
+            &gt; INITIATE_ENROLLMENT
+          </div>
+
+          <h2 className="sid-display" style={{ fontSize: "clamp(2.2rem, 5vw, 3.2rem)", fontWeight: 700, lineHeight: 1.1, margin: "0 0 24px" }}>
+            Your campus identity, <span style={{ color: T.cyan }}>verified in seconds.</span>
+          </h2>
+
+          <p style={{ fontSize: "1rem", color: T.textSec, lineHeight: 1.7, marginBottom: 40 }}>
+            Stop manual ID checks. Start secure, instant, AI-powered student verification today — completely free.
+          </p>
+
+          <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap" }}>
+            <a
+              href={isLoggedIn ? "/dashboard" : "/register"}
+              id="sid-footer-cta-primary"
+              className="sid-btn-bracket"
+              style={{ fontSize: "1rem", padding: "14px 32px" }}
+            >
+              <span>[&gt; {isLoggedIn ? "Go to Dashboard" : "Create Free Account"}]</span>
+            </a>
+
+            {!isLoggedIn && (
+              <a
+                href="/login"
+                id="sid-footer-cta-secondary"
+                className="sid-btn-bracket-outlined"
+                style={{ fontSize: "1rem", padding: "14px 28px" }}
+              >
                 Sign In
-              </Button>
+              </a>
             )}
-          </Box>
-        </Container>
-      </Box>
+          </div>
+        </div>
+      </section>
 
-      {/* ── FOOTER ───────────────────────────────────────────────── */}
-      <Box sx={{ bgcolor: "#0c1a27", color: "#fff", pt: { xs: 6, md: 8 }, pb: 4 }}>
-        <Container maxWidth="lg">
-          <Grid container spacing={4} sx={{ mb: 5 }}>
-            {/* Brand */}
-            <Grid size={{ xs: 12, md: 4 }}>
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 2 }}>
-                <Box sx={{
-                  width: 36, height: 36, borderRadius: "10px",
-                  background: "linear-gradient(135deg, #22d3ee 0%, #0891b2 100%)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                }}>
-                  <ShieldIcon sx={{ fontSize: 20, color: "#fff" }} />
-                </Box>
-                <Typography variant="h6" fontWeight={800}>SECUREID</Typography>
-              </Box>
-              <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.5)", lineHeight: 1.85, maxWidth: 280 }}>
+      {/* ── FOOTER (Terminal Status Footer) ────────────────────────────── */}
+      <footer id="sid-footer" style={{ background: T.navyRaised, borderTop: `1px solid ${T.hairline}`, padding: "64px 0 32px" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "2fr repeat(4, 1fr)", gap: 32, marginBottom: 48 }}>
+            <div>
+              <div className="sid-mono" style={{ fontSize: "0.9rem", fontWeight: 700, color: T.cyan, marginBottom: 12 }}>
+                &gt; SECUREID_SYSTEM
+              </div>
+              <p style={{ margin: 0, fontSize: "0.82rem", color: T.textSec, lineHeight: 1.85, maxWidth: 260 }}>
                 AI-powered student identity with facial recognition, KYC validation, and blockchain audit trail.
-              </Typography>
-            </Grid>
+              </p>
+              <div className="sid-mono" style={{ marginTop: 14, fontSize: "0.62rem", color: "rgba(139,152,172,0.4)" }}>
+                BUILD_HASH: 0xa3f9c1d8…
+              </div>
+            </div>
 
-            {/* Platform */}
-            <Grid size={{ xs: 6, md: 2 }}>
-              <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 2, color: "rgba(255,255,255,0.35)", letterSpacing: "0.1em", textTransform: "uppercase", fontSize: "0.68rem" }}>
-                Platform
-              </Typography>
-              {[
-                { label: "Home", to: "/" },
-                { label: "Sign In", to: "/login" },
-                { label: "Register", to: "/register" },
-                { label: "Dashboard", to: "/dashboard" },
-              ].map(({ label, to }) => (
-                <Typography key={label} component={RouterLink} to={to} variant="body2"
-                  sx={{ display: "block", mb: 1, color: "rgba(255,255,255,0.6)", textDecoration: "none", "&:hover": { color: "#fff" }, transition: "color 0.2s" }}>
-                  {label}
-                </Typography>
-              ))}
-            </Grid>
+            {Object.entries(FOOTER_LINKS).map(([heading, items]) => (
+              <div key={heading}>
+                <div className="sid-mono" style={{ fontSize: "0.62rem", fontWeight: 700, color: T.cyan, letterSpacing: "0.12em", marginBottom: 16 }}>
+                  {heading.toUpperCase()}
+                </div>
+                {items.map((item) => {
+                  const label = typeof item === "string" ? item : item.label;
+                  const to    = typeof item === "string" ? null : item.to;
+                  return to ? (
+                    <RouterLink
+                      key={label}
+                      to={to}
+                      style={{ display: "block", marginBottom: 10, fontSize: "0.82rem", color: T.textSec, textDecoration: "none" }}
+                    >
+                      {label}
+                    </RouterLink>
+                  ) : (
+                    <span key={label} style={{ display: "block", marginBottom: 10, fontSize: "0.82rem", color: "rgba(139,152,172,0.45)" }}>
+                      {label}
+                    </span>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
 
-            {/* Features */}
-            <Grid size={{ xs: 6, md: 2 }}>
-              <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 2, color: "rgba(255,255,255,0.35)", letterSpacing: "0.1em", textTransform: "uppercase", fontSize: "0.68rem" }}>
-                Features
-              </Typography>
-              {["KYC Verification", "Face Authentication", "Digital Student ID", "Blockchain Audit", "Admin Dashboard"].map((f) => (
-                <Typography key={f} variant="body2" sx={{ display: "block", mb: 1, color: "rgba(255,255,255,0.5)" }}>{f}</Typography>
-              ))}
-            </Grid>
-
-            {/* Use Cases */}
-            <Grid size={{ xs: 6, md: 2 }}>
-              <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 2, color: "rgba(255,255,255,0.35)", letterSpacing: "0.1em", textTransform: "uppercase", fontSize: "0.68rem" }}>
-                Use Cases
-              </Typography>
-              {["Exam Hall Entry", "Library Access", "Hostel Check-in", "Fee Payment Auth"].map((u) => (
-                <Typography key={u} variant="body2" sx={{ display: "block", mb: 1, color: "rgba(255,255,255,0.5)" }}>{u}</Typography>
-              ))}
-            </Grid>
-
-            {/* Tech */}
-            <Grid size={{ xs: 6, md: 2 }}>
-              <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 2, color: "rgba(255,255,255,0.35)", letterSpacing: "0.1em", textTransform: "uppercase", fontSize: "0.68rem" }}>
-                Built With
-              </Typography>
-              {["FastAPI", "React + MUI", "DeepFace AI", "Hardhat + Solidity", "SQLAlchemy"].map((t) => (
-                <Typography key={t} variant="body2" sx={{ display: "block", mb: 1, color: "rgba(255,255,255,0.5)" }}>{t}</Typography>
-              ))}
-            </Grid>
-          </Grid>
-
-          <Divider sx={{ borderColor: "rgba(255,255,255,0.08)", mb: 3 }} />
-
-          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 1 }}>
-            <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.3)" }}>
-              © 2026 SECUREID. Built for hackathon.
-            </Typography>
-            <Box sx={{ display: "flex", gap: 3 }}>
+          <div style={{ borderTop: `1px solid ${T.hairline}`, paddingTop: 24, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
+            <span className="sid-mono" style={{ fontSize: "0.68rem", color: "rgba(139,152,172,0.4)" }}>
+              © 2026 SECUREID. Terminal biometric identity platform.
+            </span>
+            <div style={{ display: "flex", gap: 24 }}>
               {["Privacy", "Terms", "Contact"].map((link) => (
-                <Typography key={link} variant="caption" sx={{ color: "rgba(255,255,255,0.35)", cursor: "pointer", "&:hover": { color: "rgba(255,255,255,0.7)" }, transition: "color 0.2s" }}>
+                <span key={link} className="sid-mono" style={{ fontSize: "0.72rem", color: "rgba(139,152,172,0.4)", cursor: "pointer" }}>
                   {link}
-                </Typography>
+                </span>
               ))}
-            </Box>
-          </Box>
-        </Container>
-      </Box>
-    </Box>
+            </div>
+          </div>
+        </div>
+      </footer>
+
+    </div>
   );
 }

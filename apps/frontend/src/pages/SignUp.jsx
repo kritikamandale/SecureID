@@ -103,15 +103,15 @@ export default function SignUp() {
                 width: 56,
                 height: 56,
                 borderRadius: "16px",
-                background: "linear-gradient(135deg, #22d3ee 0%, #0891b2 100%)",
+                background: "linear-gradient(135deg, #00D9C0 0%, #00a592 100%)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                boxShadow: "0 8px 20px rgba(34,211,238,0.4)",
+                boxShadow: "0 8px 20px rgba(0,217,192,0.35)",
                 mb: 2,
               }}
             >
-              <ShieldIcon sx={{ fontSize: 28, color: "#fff" }} />
+              <ShieldIcon sx={{ fontSize: 28, color: "#0B1220" }} />
             </Box>
             <Typography
               variant="h5"

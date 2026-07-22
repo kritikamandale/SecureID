@@ -8,7 +8,6 @@ import {
   AppBar,
   Toolbar,
   Box,
-  Button,
   Typography,
   Avatar,
   IconButton,
@@ -54,19 +53,6 @@ export default function Navbar() {
     setDrawerOpen(false);
   };
 
-  const navLinkSx = (path) => ({
-    color: pathname === path ? "primary.main" : "text.secondary",
-    fontWeight: pathname === path ? 700 : 500,
-    fontSize: "0.875rem",
-    px: 1.5,
-    py: 0.75,
-    borderRadius: 2,
-    bgcolor: pathname === path ? "rgba(34,211,238,0.1)" : "transparent",
-    textDecoration: "none",
-    transition: "all 0.2s",
-    "&:hover": { bgcolor: "rgba(34,211,238,0.08)", color: "primary.main" },
-  });
-
   const navLinks = [
     { label: "Home", to: "/" },
     ...(isLoggedIn ? [{ label: "Dashboard", to: "/dashboard" }] : []),
@@ -79,27 +65,27 @@ export default function Navbar() {
       anchor="right"
       open={drawerOpen}
       onClose={() => setDrawerOpen(false)}
-      PaperProps={{ sx: { width: 240, pt: 2 } }}
+      PaperProps={{ sx: { width: 240, pt: 2, bgcolor: "#121C2E" } }}
     >
       <Box sx={{ px: 2, pb: 1, display: "flex", alignItems: "center", gap: 1 }}>
         <Box
           sx={{
             width: 32,
             height: 32,
-            borderRadius: "8px",
-            background: "linear-gradient(135deg, #22d3ee 0%, #0891b2 100%)",
+            background: "linear-gradient(135deg, #00D9C0 0%, #00a592 100%)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            clipPath: "polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 0 100%)",
           }}
         >
-          <ShieldIcon sx={{ fontSize: 18, color: "#fff" }} />
+          <ShieldIcon sx={{ fontSize: 18, color: "#0B1220" }} />
         </Box>
         <Typography variant="h6" fontWeight={700} fontSize="1rem" className="nav-brand-text">
           SECUREID
         </Typography>
       </Box>
-      <Divider sx={{ mb: 1 }} />
+      <Divider sx={{ mb: 1, borderColor: "rgba(237, 242, 247, 0.08)" }} />
       <List disablePadding>
         {navLinks.map((link) => (
           <ListItem key={link.to} disablePadding>
@@ -110,10 +96,11 @@ export default function Navbar() {
               selected={pathname === link.to}
               sx={{
                 mx: 1,
-                borderRadius: 2,
+                borderRadius: 0,
+                borderLeft: pathname === link.to ? "2px solid #00D9C0" : "2px solid transparent",
                 "&.Mui-selected": {
-                  bgcolor: "rgba(34,211,238,0.1)",
-                  color: "primary.main",
+                  bgcolor: "rgba(0, 217, 192, 0.1)",
+                  color: "#00D9C0",
                   fontWeight: 700,
                 },
               }}
@@ -126,7 +113,7 @@ export default function Navbar() {
           </ListItem>
         ))}
       </List>
-      <Divider sx={{ my: 1 }} />
+      <Divider sx={{ my: 1, borderColor: "rgba(237, 242, 247, 0.08)" }} />
       <List disablePadding>
         {!isLoggedIn ? (
           <>
@@ -135,39 +122,38 @@ export default function Navbar() {
                 component={RouterLink}
                 to="/login"
                 onClick={() => setDrawerOpen(false)}
-                sx={{ mx: 1, borderRadius: 2 }}
+                sx={{ mx: 1 }}
               >
                 <ListItemText primary="Sign In" />
               </ListItemButton>
             </ListItem>
             <ListItem disablePadding>
-              <ListItemButton
-                component={RouterLink}
-                to="/register"
-                onClick={() => setDrawerOpen(false)}
-                sx={{ mx: 1, borderRadius: 2, color: "primary.main", fontWeight: 700 }}
-              >
-                <ListItemText
-                  primary="Get Started"
-                  primaryTypographyProps={{ fontWeight: 700, color: "primary.main" }}
-                />
-              </ListItemButton>
+              <Box sx={{ px: 2, pt: 1, width: "100%" }}>
+                <RouterLink
+                  to="/register"
+                  className="sid-btn-bracket"
+                  onClick={() => setDrawerOpen(false)}
+                  style={{ width: "100%", justifyContent: "center", fontSize: "0.85rem", padding: "10px 16px" }}
+                >
+                  Get Started
+                </RouterLink>
+              </Box>
             </ListItem>
           </>
         ) : (
           <>
             <ListItem disablePadding>
-              <ListItemButton disabled sx={{ mx: 1, borderRadius: 2 }}>
+              <ListItemButton disabled sx={{ mx: 1 }}>
                 <ListItemText
                   primary={userName || "Student"}
-                  primaryTypographyProps={{ fontWeight: 600, fontSize: "0.85rem" }}
+                  primaryTypographyProps={{ fontWeight: 600, fontSize: "0.85rem", color: "text.primary" }}
                 />
               </ListItemButton>
             </ListItem>
             <ListItem disablePadding>
               <ListItemButton
                 onClick={handleLogout}
-                sx={{ mx: 1, borderRadius: 2, color: "error.main" }}
+                sx={{ mx: 1, color: "error.main" }}
               >
                 <ListItemText
                   primary="Logout"
@@ -188,10 +174,10 @@ export default function Navbar() {
           position="sticky"
           elevation={0}
           sx={{
-            background: "rgba(255,255,255,0.92)",
+            background: "rgba(11, 18, 32, 0.9)",
             backdropFilter: "blur(20px)",
             WebkitBackdropFilter: "blur(20px)",
-            borderBottom: "1px solid rgba(8,145,178,0.1)",
+            borderBottom: "1px solid rgba(237, 242, 247, 0.08)",
             color: "text.primary",
           }}
         >
@@ -210,22 +196,22 @@ export default function Navbar() {
                 textDecoration: "none",
                 display: "flex",
                 alignItems: "center",
-                gap: 8,
+                gap: 10,
               }}
             >
               <Box
                 sx={{
                   width: 36,
                   height: 36,
-                  borderRadius: "10px",
-                  background: "linear-gradient(135deg, #22d3ee 0%, #0891b2 100%)",
+                  background: "linear-gradient(135deg, #00D9C0 0%, #00a592 100%)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  boxShadow: "0 4px 12px rgba(34,211,238,0.35)",
+                  clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)",
+                  boxShadow: "0 4px 12px rgba(0,217,192,0.35)",
                 }}
               >
-                <ShieldIcon sx={{ fontSize: 20, color: "#fff" }} />
+                <ShieldIcon sx={{ fontSize: 20, color: "#0B1220" }} />
               </Box>
               <Typography
                 variant="h6"
@@ -239,56 +225,49 @@ export default function Navbar() {
 
             <Box sx={{ flex: 1 }} />
 
-            {/* Desktop Links */}
+            {/* Desktop Links: Plain text with thin hover underline, NO pill backgrounds */}
             <Box
               sx={{
                 display: { xs: "none", md: "flex" },
                 alignItems: "center",
-                gap: 0.5,
+                gap: 2,
               }}
             >
               {navLinks.map((link) => (
-                <Button
+                <RouterLink
                   key={link.to}
-                  component={RouterLink}
                   to={link.to}
-                  sx={navLinkSx(link.to)}
+                  className={`sid-nav-link ${pathname === link.to ? "active" : ""}`}
                 >
                   {link.label}
-                </Button>
+                </RouterLink>
               ))}
             </Box>
 
             <Box
               sx={{
-                ml: 2,
+                ml: 3,
                 display: { xs: "none", md: "flex" },
                 alignItems: "center",
-                gap: 1,
+                gap: 2,
               }}
             >
               {!isLoggedIn ? (
                 <>
-                  <Button
-                    component={RouterLink}
+                  <RouterLink
                     to="/login"
-                    variant="outlined"
-                    color="primary"
-                    size="small"
-                    sx={{ borderRadius: 2, fontWeight: 600 }}
+                    className="sid-nav-link"
+                    style={{ fontSize: "0.9rem", fontWeight: 600 }}
                   >
                     Sign In
-                  </Button>
-                  <Button
-                    component={RouterLink}
+                  </RouterLink>
+                  {/* Bracket-cut CTA button — square corners with diagonal cut corner */}
+                  <RouterLink
                     to="/register"
-                    variant="contained"
-                    color="primary"
-                    size="small"
-                    sx={{ borderRadius: 2 }}
+                    className="sid-btn-bracket"
                   >
                     Get Started
-                  </Button>
+                  </RouterLink>
                 </>
               ) : (
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -297,10 +276,11 @@ export default function Navbar() {
                       width: 34,
                       height: 34,
                       cursor: "pointer",
-                      background:
-                        "linear-gradient(135deg, #22d3ee 0%, #0891b2 100%)",
+                      background: "linear-gradient(135deg, #00D9C0 0%, #00a592 100%)",
+                      color: "#0B1220",
                       fontSize: "0.8rem",
                       fontWeight: 700,
+                      clipPath: "polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 0 100%)",
                     }}
                     onClick={handleMenuOpen}
                   >
@@ -310,10 +290,10 @@ export default function Navbar() {
                     anchorEl={anchorEl}
                     open={Boolean(anchorEl)}
                     onClose={handleMenuClose}
-                    PaperProps={{ sx: { borderRadius: 2, mt: 1, minWidth: 160 } }}
+                    PaperProps={{ sx: { borderRadius: 0, mt: 1, minWidth: 160, bgcolor: "#121C2E", border: "1px solid rgba(237, 242, 247, 0.08)" } }}
                   >
-                    <MenuItem disabled>
-                      <Typography variant="body2" fontWeight={600}>
+                    <MenuItem disabled sx={{ opacity: 0.9 }}>
+                      <Typography variant="body2" fontWeight={600} color="text.primary">
                         {userName || "Student"}
                       </Typography>
                     </MenuItem>
@@ -343,7 +323,7 @@ export default function Navbar() {
 
             {/* Mobile hamburger */}
             <IconButton
-              sx={{ display: { xs: "flex", md: "none" }, ml: 1 }}
+              sx={{ display: { xs: "flex", md: "none" }, ml: 1, color: "text.primary" }}
               onClick={handleDrawerToggle}
               aria-label="Open navigation menu"
             >

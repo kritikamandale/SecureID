@@ -22,16 +22,16 @@ export default function Timeline({ timelineData }) {
   if (loading)
     return (
       <Box sx={{ p: 3, display: "flex", justifyContent: "center" }}>
-        <CircularProgress size={24} />
+        <CircularProgress size={24} color="primary" />
       </Box>
     );
 
   if (!events.length) return null;
 
   return (
-    <Card>
+    <Card sx={{ background: "#121C2E", border: "1px solid rgba(237, 242, 247, 0.08)" }}>
       <CardContent sx={{ p: 3 }}>
-        <Typography variant="h6" fontWeight={700} mb={2.5}>
+        <Typography variant="h6" fontWeight={700} mb={2.5} color="text.primary">
           Recent Activity
         </Typography>
         <Box sx={{ position: "relative", pl: 2.5 }}>
@@ -43,7 +43,7 @@ export default function Timeline({ timelineData }) {
               top: 8,
               bottom: 8,
               width: 2,
-              background: "linear-gradient(180deg, #22d3ee, rgba(34,211,238,0.1))",
+              background: "linear-gradient(180deg, #00D9C0, rgba(0,217,192,0.1))",
               borderRadius: 1,
             }}
           />
@@ -58,14 +58,14 @@ export default function Timeline({ timelineData }) {
                   width: 10,
                   height: 10,
                   borderRadius: "50%",
-                  background: "linear-gradient(135deg, #22d3ee, #0891b2)",
-                  boxShadow: "0 0 0 3px rgba(34,211,238,0.15)",
+                  background: "linear-gradient(135deg, #00D9C0, #00a592)",
+                  boxShadow: "0 0 0 3px rgba(0,217,192,0.2)",
                 }}
               />
               <Typography variant="body2" fontWeight={700} color="text.primary" lineHeight={1.3}>
                 {ev.title}
               </Typography>
-              <Typography variant="caption" color="text.disabled" display="block" mb={0.5}>
+              <Typography className="sid-mono" variant="caption" color="text.disabled" display="block" mb={0.5}>
                 {new Date(ev.timestamp).toLocaleString()}
               </Typography>
               <Typography variant="caption" color="text.secondary" lineHeight={1.6}>

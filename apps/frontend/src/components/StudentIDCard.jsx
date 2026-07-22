@@ -4,7 +4,6 @@ import {
   CardContent,
   Typography,
   Chip,
-  Avatar,
   Divider,
 } from "@mui/material";
 import VerifiedIcon from "@mui/icons-material/Verified";
@@ -17,16 +16,16 @@ export default function StudentIDCard({ name, email, studentId, kycStatus }) {
   return (
     <Card
       sx={{
-        background: "linear-gradient(135deg, #22d3ee 0%, #0891b2 100%)",
-        color: "#fff",
+        background: "linear-gradient(135deg, #121C2E 0%, #0B1220 100%)",
+        color: "#EDF2F7",
         borderRadius: 4,
         overflow: "hidden",
         position: "relative",
-        border: "none",
-        boxShadow: "0 8px 32px rgba(34,211,238,0.35)",
+        border: "1px solid rgba(0, 217, 192, 0.35)",
+        boxShadow: "0 8px 32px rgba(0, 217, 192, 0.15)",
       }}
     >
-      {/* Decorative circles */}
+      {/* Decorative ambient glow circles */}
       <Box
         sx={{
           position: "absolute",
@@ -35,7 +34,7 @@ export default function StudentIDCard({ name, email, studentId, kycStatus }) {
           width: 160,
           height: 160,
           borderRadius: "50%",
-          bgcolor: "rgba(255,255,255,0.08)",
+          bgcolor: "rgba(0, 217, 192, 0.08)",
         }}
       />
       <Box
@@ -46,7 +45,7 @@ export default function StudentIDCard({ name, email, studentId, kycStatus }) {
           width: 100,
           height: 100,
           borderRadius: "50%",
-          bgcolor: "rgba(255,255,255,0.06)",
+          bgcolor: "rgba(0, 217, 192, 0.05)",
         }}
       />
 
@@ -60,11 +59,13 @@ export default function StudentIDCard({ name, email, studentId, kycStatus }) {
         >
           <Box>
             <Typography
+              className="sid-mono"
               variant="overline"
               sx={{
-                color: "rgba(255,255,255,0.7)",
+                color: "#00D9C0",
                 letterSpacing: 2,
                 fontSize: "0.65rem",
+                fontWeight: 700,
               }}
             >
               SECUREID — STUDENT DIGITAL ID
@@ -72,19 +73,20 @@ export default function StudentIDCard({ name, email, studentId, kycStatus }) {
             <Typography
               variant="h5"
               fontWeight={800}
-              sx={{ mt: 0.5, lineHeight: 1.2 }}
+              sx={{ mt: 0.5, lineHeight: 1.2, color: "#EDF2F7" }}
             >
               {name || "—"}
             </Typography>
             <Typography
               variant="body2"
-              sx={{ color: "rgba(255,255,255,0.75)", mt: 0.5 }}
+              sx={{ color: "#8B98AC", mt: 0.5 }}
             >
               {email || "—"}
             </Typography>
             <Typography
+              className="sid-mono"
               variant="caption"
-              sx={{ color: "rgba(255,255,255,0.6)", display: "block", mt: 0.5 }}
+              sx={{ color: "#00D9C0", display: "block", mt: 0.5, opacity: 0.9 }}
             >
               ID: #{studentId || "—"}
             </Typography>
@@ -93,17 +95,18 @@ export default function StudentIDCard({ name, email, studentId, kycStatus }) {
           {/* QR Code */}
           <Box
             sx={{
-              bgcolor: "#fff",
+              bgcolor: "#0B1220",
               p: 1,
               borderRadius: 2,
-              boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+              border: "1px solid rgba(0, 217, 192, 0.3)",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
             }}
           >
-            <QRCodeSVG value={qrValue} size={80} fgColor="#1A1F36" />
+            <QRCodeSVG value={qrValue} size={80} fgColor="#00D9C0" bgColor="#0B1220" />
           </Box>
         </Box>
 
-        <Divider sx={{ my: 2, borderColor: "rgba(255,255,255,0.2)" }} />
+        <Divider sx={{ my: 2, borderColor: "rgba(237, 242, 247, 0.08)" }} />
 
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <Chip
@@ -112,8 +115,8 @@ export default function StudentIDCard({ name, email, studentId, kycStatus }) {
                 sx={{
                   fontSize: "16px !important",
                   color: isVerified
-                    ? "#00C853 !important"
-                    : "rgba(255,255,255,0.5) !important",
+                    ? "#34d399 !important"
+                    : "#8B98AC !important",
                 }}
               />
             }
@@ -121,16 +124,17 @@ export default function StudentIDCard({ name, email, studentId, kycStatus }) {
             size="small"
             sx={{
               bgcolor: isVerified
-                ? "rgba(0,200,83,0.2)"
-                : "rgba(255,255,255,0.15)",
-              color: isVerified ? "#69F0AE" : "rgba(255,255,255,0.7)",
+                ? "rgba(16, 185, 129, 0.12)"
+                : "rgba(237, 242, 247, 0.08)",
+              color: isVerified ? "#34d399" : "#8B98AC",
               fontWeight: 700,
-              border: `1px solid ${isVerified ? "rgba(0,200,83,0.5)" : "rgba(255,255,255,0.3)"}`,
+              border: `1px solid ${isVerified ? "rgba(16, 185, 129, 0.3)" : "rgba(237, 242, 247, 0.12)"}`,
             }}
           />
           <Typography
+            className="sid-mono"
             variant="caption"
-            sx={{ color: "rgba(255,255,255,0.6)", ml: "auto" }}
+            sx={{ color: "#8B98AC", ml: "auto" }}
           >
             Issued:{" "}
             {new Date().toLocaleDateString("en-IN", {

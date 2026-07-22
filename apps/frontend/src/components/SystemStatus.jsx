@@ -52,7 +52,7 @@ export default function SystemStatus({ compact = false }) {
         sx={{ display: "flex", gap: 1, flexWrap: "wrap", alignItems: "center" }}
       >
         {loading ? (
-          <CircularProgress size={16} />
+          <CircularProgress size={16} color="primary" />
         ) : (
           statuses.map((s) => (
             <Chip
@@ -62,8 +62,8 @@ export default function SystemStatus({ compact = false }) {
                   sx={{
                     fontSize: "10px !important",
                     color: s.online
-                      ? "#00C853 !important"
-                      : "#f44336 !important",
+                      ? "#34d399 !important"
+                      : "#f87171 !important",
                   }}
                 />
               }
@@ -71,10 +71,10 @@ export default function SystemStatus({ compact = false }) {
               size="small"
               sx={{
                 bgcolor: s.online
-                  ? "rgba(0,200,83,0.1)"
-                  : "rgba(244,67,54,0.1)",
-                color: s.online ? "#007B33" : "#C62828",
-                border: `1px solid ${s.online ? "rgba(0,200,83,0.3)" : "rgba(244,67,54,0.3)"}`,
+                  ? "rgba(16, 185, 129, 0.12)"
+                  : "rgba(239, 68, 68, 0.12)",
+                color: s.online ? "#34d399" : "#f87171",
+                border: `1px solid ${s.online ? "rgba(16, 185, 129, 0.3)" : "rgba(239, 68, 68, 0.3)"}`,
               }}
             />
           ))
@@ -86,9 +86,9 @@ export default function SystemStatus({ compact = false }) {
   return (
     <Box
       sx={{
-        bgcolor: "rgba(8,145,178,0.04)",
+        bgcolor: "#121C2E",
         backdropFilter: "blur(12px)",
-        border: "1px solid rgba(34,211,238,0.15)",
+        border: "1px solid rgba(237, 242, 247, 0.08)",
         borderRadius: 3,
         p: 3,
         maxWidth: 480,
@@ -105,7 +105,7 @@ export default function SystemStatus({ compact = false }) {
       </Typography>
       {loading ? (
         <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-          <CircularProgress size={16} />
+          <CircularProgress size={16} color="primary" />
           <Typography variant="body2" color="text.secondary">
             Checking services…
           </Typography>
@@ -134,8 +134,8 @@ export default function SystemStatus({ compact = false }) {
                     sx={{
                       fontSize: "10px !important",
                       color: s.online
-                        ? "#00C853 !important"
-                        : "#f44336 !important",
+                        ? "#34d399 !important"
+                        : "#f87171 !important",
                     }}
                   />
                 }
@@ -143,11 +143,11 @@ export default function SystemStatus({ compact = false }) {
                 size="small"
                 sx={{
                   bgcolor: s.online
-                    ? "rgba(0,200,83,0.12)"
-                    : "rgba(244,67,54,0.12)",
-                  color: s.online ? "#007B33" : "#C62828",
+                    ? "rgba(16, 185, 129, 0.12)"
+                    : "rgba(239, 68, 68, 0.12)",
+                  color: s.online ? "#34d399" : "#f87171",
                   fontWeight: 700,
-                  border: `1px solid ${s.online ? "rgba(0,200,83,0.35)" : "rgba(244,67,54,0.35)"}`,
+                  border: `1px solid ${s.online ? "rgba(16, 185, 129, 0.35)" : "rgba(239, 68, 68, 0.35)"}`,
                 }}
               />
             </Box>

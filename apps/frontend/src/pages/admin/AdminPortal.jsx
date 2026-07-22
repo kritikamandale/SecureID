@@ -90,12 +90,10 @@ function BlockchainExplorer() {
               sx={{
                 p: 2.5,
                 minWidth: 220,
-                border: "1px solid",
-                borderColor: "divider",
                 borderRadius: 2,
-                bgcolor: "#f8fafc",
+                bgcolor: "background.paper",
                 color: "text.primary",
-                border: "1px solid rgba(8,145,178,0.12)",
+                border: "1px solid rgba(237, 242, 247, 0.08)",
               }}
             >
               <Typography

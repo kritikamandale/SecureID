@@ -54,7 +54,7 @@ function AuthChart({ days }) {
                   sx={{
                     position: "absolute", bottom: 0, left: 0, right: 0,
                     height: d.attempts === 0 ? 4 : `${(d.attempts / maxAttempts) * 100}%`,
-                    bgcolor: d.attempts === 0 ? "grey.100" : "grey.300",
+                    bgcolor: d.attempts === 0 ? "rgba(237, 242, 247, 0.08)" : "rgba(239, 68, 68, 0.4)",
                     borderRadius: "4px 4px 0 0",
                     transition: "height 0.4s ease",
                   }}
@@ -64,7 +64,7 @@ function AuthChart({ days }) {
                     sx={{
                       position: "absolute", bottom: 0, left: 0, right: 0,
                       height: `${(d.successes / maxAttempts) * 100}%`,
-                      bgcolor: "success.main",
+                      bgcolor: "primary.main",
                       borderRadius: "4px 4px 0 0",
                       opacity: 0.85,
                       transition: "height 0.4s ease",
@@ -72,7 +72,7 @@ function AuthChart({ days }) {
                   />
                 )}
               </Box>
-              <Typography variant="caption" color="text.secondary" fontSize="0.6rem" noWrap>
+              <Typography className="sid-mono" variant="caption" color="text.secondary" fontSize="0.6rem" noWrap>
                 {d.date.slice(5)}
               </Typography>
             </Box>
@@ -80,7 +80,7 @@ function AuthChart({ days }) {
         ))}
       </Box>
       <Box sx={{ display: "flex", gap: 2, mt: 1.5 }}>
-        {[{ color: "success.main", label: "Passed" }, { color: "grey.300", label: "Failed" }].map(({ color, label }) => (
+        {[{ color: "primary.main", label: "Passed" }, { color: "rgba(239, 68, 68, 0.5)", label: "Failed" }].map(({ color, label }) => (
           <Box key={label} sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
             <Box sx={{ width: 10, height: 10, bgcolor: color, borderRadius: 0.5 }} />
             <Typography variant="caption" color="text.secondary">{label}</Typography>
