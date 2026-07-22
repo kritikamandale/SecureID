@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "build": "echo \"No backend node build required\"",
     "dev": "uvicorn app.main:app --reload --port 8000",
     "start": "uvicorn app.main:app --port 8000",
     "test": "python -m pytest tests/ -v"

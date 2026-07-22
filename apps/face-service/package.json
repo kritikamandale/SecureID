@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "build": "echo \"No face-service node build required\"",
     "dev": "uvicorn app:app --reload --port 8001",
     "start": "uvicorn app:app --port 8001",
     "test": "python -m pytest tests/ -v"

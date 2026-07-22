@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "build": "echo \"No config build required\"",
     "lint": "echo \"No shared config lint\"",
     "test": "echo \"No shared config tests\""
   }
