@@ -6,52 +6,67 @@ on:
   pull_request:
     branches: [ main ]
 
+# Cancel superseded runs on the same ref to save CI minutes.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  build-and-test:
-    name: Build & Verify Frontend & Microservices
+  frontend:
+    name: Build Frontend (Vite + Turbo)
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: '9.15.4'
+
       - name: Setup Node.js Environment
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: '9.15.4'
-
-      - name: Get pnpm Store Directory
-        id: pnpm-cache
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
-
-      - name: Cache pnpm Dependencies
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+          cache: 'pnpm'
 
       - name: Install Monorepo Dependencies
+        # Lockfile can lag behind package.json in active development,
+        # so we don't fail the build on a stale lockfile.
         run: pnpm install --no-frozen-lockfile
 
-      - name: Build Application (Turbo)
+      - name: Build Frontend
         run: pnpm build
 
-      - name: Setup Python Environment for Backend Services
+      - name: Upload Frontend Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: apps/frontend/dist
+          if-no-files-found: error
+          retention-days: 7
+
+  backend:
+    name: Verify Python Services (backend + face-service)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python Environment
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+          cache: 'pip'
 
-      - name: Verify Backend Dependencies
+      - name: Install & Verify Backend Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r apps/backend/requirements.txt
           pip install -r apps/face-service/requirements.txt
+
+      - name: Compile-check Python Sources
+        run: |
+          python -m compileall apps/backend/app apps/face-service
