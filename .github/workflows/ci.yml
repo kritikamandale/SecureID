@@ -12,8 +12,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  frontend:
-    name: Build Frontend (Vite + Turbo)
+  build-and-verify:
+    name: Build & Verify Monorepo
     runs-on: ubuntu-latest
 
     steps:
@@ -30,43 +30,30 @@ jobs:
         with:
           node-version: '20'
           cache: 'pnpm'
+          cache-dependency-path: 'pnpm-lock.yaml'
 
       - name: Install Monorepo Dependencies
-        # Lockfile can lag behind package.json in active development,
-        # so we don't fail the build on a stale lockfile.
         run: pnpm install --no-frozen-lockfile
 
-      - name: Build Frontend
+      - name: Build Frontend Application
         run: pnpm build
-
-      - name: Upload Frontend Build Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: frontend-dist
-          path: apps/frontend/dist
-          if-no-files-found: error
-          retention-days: 7
-
-  backend:
-    name: Verify Python Services (backend + face-service)
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
 
       - name: Setup Python Environment
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
           cache: 'pip'
+          cache-dependency-path: |
+            apps/backend/requirements.txt
+            apps/face-service/requirements.txt
 
-      - name: Install & Verify Backend Dependencies
+      - name: Install Python Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r apps/backend/requirements.txt
-          pip install -r apps/face-service/requirements.txt
+          pip install --prefer-binary -r apps/backend/requirements.txt
+          pip install --prefer-binary -r apps/face-service/requirements.txt
 
       - name: Compile-check Python Sources
         run: |
           python -m compileall apps/backend/app apps/face-service
+
