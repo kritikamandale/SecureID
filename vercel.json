@@ -1,10 +1,17 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "vite",
-  "installCommand": "pnpm install --no-frozen-lockfile",
   "buildCommand": "pnpm --filter @secureid/frontend build",
   "outputDirectory": "apps/frontend/dist",
   "rewrites": [
+    {
+      "source": "/api/face/(.*)",
+      "destination": "http://127.0.0.1:8001/$1"
+    },
+    {
+      "source": "/api/(.*)",
+      "destination": "http://127.0.0.1:8000/api/$1"
+    },
     {
       "source": "/(.*)",
       "destination": "/index.html"
